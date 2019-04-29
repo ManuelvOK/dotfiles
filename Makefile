@@ -28,6 +28,8 @@ all: $(LINKS) plugins st-install st-uninstall
 	fi
 	$(MAKE) vim
 
+~/.gnupg: gnupg
+
 vim: $(VUNDLEDIR)
 	vim +PluginUpdate +PluginClean +qa
 	@# PluginUpdate updates the timestamp of $(BUNDLEDIR), thus it is newer
@@ -38,6 +40,9 @@ vim: $(VUNDLEDIR)
 	@# order-only prerequisite, though it actually is one.
 	touch $(VUNDLEDIR)
 	cd ~/.vim && ./gen_stl_tags.sh
+
+gnupg:
+	chmod 700 .gnupg
 
 $(VUNDLEDIR): $(BUNDLEDIR)
 	git clone https://github.com/gmarik/Vundle.vim.git $@
