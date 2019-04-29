@@ -1,2 +1,6 @@
-account.*
-aliases
+*
+!colors.rc
+!gpg.rc
+!mailcap
+!muttrc
+!.gitignore
