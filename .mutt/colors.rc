@@ -1,0 +1,48 @@
+# -*-muttrc-*-
+
+
+## colors
+
+# basic ui coloring
+color   progress    white   brightblue
+color   status      default color8
+color   indicator   default color24
+
+# mark mails based on their state/the receiver.
+color index red default "~C root@ifsr\.de"
+color index green default "( ~C manuel@ifsr\.de | ~C info@manuel-thieme\.de | ~C manuel\.thieme@tu-dresden\.de | ~C manuel\.thieme@mailbox\.tu-dresden.de | ~C s0020628@mail\.zih\.tu-dresden\.de)"
+color index magenta default "( ~C fsr@ifsr\.de | ~C ese@ifsr\.de | ~C ese-orga@ifsr\.de)"
+color index yellow default "( ~C kif@ifsr\.de | ~C kif-orga@ifsr\.de)"
+#color index brightyellow default ""
+
+color   index   brightblue    default    "~N"    # mark new mails
+color   index   color8  default "~D"    # mark deleted mails.
+color   index   white cyan    "~T"    # mark tagged messages
+
+# color mail contents
+color   signature     brightgreen     default # signatures
+color   quoted  cyan    default # quoted text
+color   quoted1 yellow  default # quote level 2
+color   quoted2 green   default # quote level 3
+color   quoted3 magenta default # quote level 4
+color   quoted4 red     default # quote level 5
+
+# Color if the attachment is autoviewed
+color   attach_headers     brightgreen     default        "Autoview"
+# Color only the brackets around the headers
+color   attach_headers     brightyellow    default        "^\\[--"
+color   attach_headers     brightyellow    default        "--]$"
+# Color the mime type and the size
+color   attach_headers     green           default        "Type: [a-z]+/[a-z0-9\-]+"
+color   attach_headers     green           default        "Size: [0-9\.]+[KM]"
+# Color GPGME signature checks -- not working rn
+color   attach_headers     brightgreen     default        "Good signature from.*"
+color   attach_headers     brightred       default        "Bad signature from.*"
+color   attach_headers     brightred       default        "BAD signature from.*"
+color   attach_headers     brightred       default        "Note: This key has expired!"
+color   attach_headers     brightmagenta   default        "Problem signature from.*"
+color   attach_headers     brightmagenta   default        "WARNING: This key is not certified with a trusted signature!"
+color   attach_headers     brightmagenta   default        "         There is no indication that the signature belongs to the owner."
+color   attach_headers     brightmagenta   default        "can't handle these multiple signatures"
+color   attach_headers     brightmagenta   default        "signature verification suppressed"
+color   attach_headers     brightmagenta   default        "invalid node with packet of type"
