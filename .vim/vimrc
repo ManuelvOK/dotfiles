@@ -1,11 +1,18 @@
-"             _         _         _
-"     __   __(_)__   __(_)__   __(_)
-"     \ \ / /| |\ \ / /| |\ \ / /| |
-"      \ V / | | \ V / | | \ V / | |
-"       \_/  |_|  \_/  |_|  \_/  |_|
-"
-"    The Editor of the Beast - IMproved
+"    __  __       _         __     ___                                  _
+"   |  \/  | __ _| | _____  \ \   / (_)_ __ ___     __ _ _ __ ___  __ _| |_
+"   | |\/| |/ _` | |/ / _ \  \ \ / /| | '_ ` _ \   / _` | '__/ _ \/ _` | __|
+"   | |  | | (_| |   <  __/   \ V / | | | | | | | | (_| | | |  __/ (_| | |_
+"   |_|  |_|\__,_|_|\_\___|    \_/  |_|_| |_| |_|  \__, |_|  \___|\__,_|\__|
+"                                                  |___/
+"                                           _       _
+"                          __ _  __ _  __ _(_)_ __ | |
+"                         / _` |/ _` |/ _` | | '_ \| |
+"                        | (_| | (_| | (_| | | | | |_|
+"                         \__,_|\__, |\__,_|_|_| |_(_)
+"                               |___/
 
+
+set nocompatible
 
 " Plugin management (I use Vundle) {{{1
 filetype off
@@ -13,22 +20,23 @@ set runtimepath+=~/.vim/bundle/Vundle.vim
 
 call vundle#begin()
 " Plugin sources {{{2
-Plugin 'salsifis/vim-transpose'
-Plugin 'gmarik/Vundle.vim'
-Plugin 'jceb/vim-orgmode'
-Plugin 'lodifice/guillotine.vim'
-Plugin 'lodifice/omnitags.vim'
-Plugin 'lodifice/panzer.vim'
-Plugin 'lodifice/pathfinder.vim'
-"Plugin 'michalbachowski/vim-wombat256mod'
-Plugin 'scrooloose/syntastic'
+Plugin 'VundleVim/Vundle.vim'
+Plugin 'vim-syntastic/syntastic'
 Plugin 'tpope/vim-endwise'
-Plugin 'tpope/vim-speeddating'
-Plugin 'lodifice/wombat256.vim'
-Plugin 'miyakogi/seiya.vim'
+Plugin 'justinmk/vim-syntax-extra'
+Plugin 'pboettch/vim-highlight-cursor-words'
+Plugin 'lodifice/omnitags.vim'
+Plugin 'lodifice/pathfinder.vim'
+Plugin 'lodifice/guillotine.vim'
+Plugin 'lodifice/panzer.vim'
 Plugin 'lodifice/mzview.vim'
-"Plugin 'ctrlpvim/ctrlp.vim'
+Plugin 'lodifice/wombat256.vim'
+Plugin 'kien/ctrlp.vim'
+Plugin 'kdrakon/AnswerSetProgramming-VIM-Syntax-Highlighting'
+Plugin 'FromtonRouge/OmniCppComplete'
+" }}}2
 call vundle#end()
+" }}}1
 
 filetype plugin indent on
 syntax on
@@ -41,29 +49,48 @@ set noswapfile
 
 " Sanity defaults {{{2
 set clipboard=      " Welches Rindvieh hat `autoselect` als Default eingestellt?
+"set clipboard=unnamedplus
 
 " Tabs and spaces {{{2
 set expandtab       " expand tabs to spaces
-set softtabstop=4   " each tab is 4 spaces
+set tabstop=4       " each tab is 4 spaces
 set shiftwidth=4    " use 4 spaces for each indent level
 set shiftround      " orientate indent on shiftwidth
-"
+
 " Search {{{2
 set hlsearch        " always highlight search results
 set incsearch       " search incrementally
 set ignorecase      " ignore case when searching
 set smartcase       " ignore ignorecase when uppercase letter in search string
-"
-" History & undo levels {{{2
+
+" History & undo levels
 set history=777     " command line history
 set undolevels=777  " normal mode history
 
 " Buffer management {{{2
 set hidden          " Make it possible to switch buffers without writing
+set tabpagemax=25   " display up to 25 tabpages
 
+" controls {{{2
+set mouse=a " use mouse and backspace
+
+" misc {{{2
+set wildignore+=*/build/*,*.d,*.o,main,*/venv/*,*/__pycache__/*,*.pdf,*.out,*.toc,*.fdb_latexmk,*.aux,*.log,*.fls   " ignore these filetypes
+
+" Completion {{{1
 " Command line completion {{{2
 set wildmenu                    " Show possible completions
 set wildmode=longest:full,full  " Make completion behave like in zsh
+
+" omnicompletion {{{2
+set completeopt=menu,preview    " Show preview on selected entry
+autocmd CompleteDone * pclose   " close preview when completion is done
+autocmd BufNewFile,BufRead,BufEnter *.cpp,*.hpp,*.cc set omnifunc=omni#cpp#complete#Main
+"set tags+=~/.vim/tags/tags
+
+" Folding {{{1
+let g:xml_syntax_folding=1      " proper xml folding
+"}}}1
 
 " Visuals {{{1
 " Orientation {{{2
@@ -75,21 +102,53 @@ set wrap linebreak      " wrap on word bounds
 set breakindent         " indent wrapped lines as previous line
 set showcmd             " show currently pending command string
 set cursorline          " highlight current line
+set colorcolumn=100     " highlight column 100
+
+" whitespaces {{{2
+set list                        " show Whitespaces
+set listchars=tab:\ \ ,trail:·  " show tabs as tabs and trailing spaces as dots
 
 " Color scheme {{{2
 set t_Co=256
-color wombat256mod
+silent! color wombat256mod      " Use wombat TODO: fork for following settings
+highlight LineNr ctermbg=234
+highlight TabLineFill ctermfg=234
+highlight Search ctermbg=none
+highlight Comment ctermfg=241
+highligh ColorColumn ctermbg=233
 
 " Font {{{2
 set guifont="Fantasque Sans Mono 12"
 
-" Mappings {{{1
-" Remove search highlighting
-noremap <Leader><Leader> :nohlsearch<Cr>
-
 " Plugin configuration {{{1
-" Guillotine {{{2
+" Guillotine.vim {{{2
 augroup guillotine
     autocmd!
     autocmd BufEnter * if exists(":ToggleHeaderSource") | execute "nmap <buffer> ga :ToggleHeaderSource<cr>" | endif
 augroup END
+
+" CtrlP {{{2
+let g:ctrlp_root_markers = ["tags", ".git"] " proper pathfinding
+
+" Pathfinder.vim {{{2
+let g:pathfinder_targets = ["tags", ".git"] " pathfinder heuristic
+
+" Mzview.vim {{{2
+" goto position in pdf
+nnoremap gp :SynctexForward<CR>
+let g:tex_flavor = "latex" " for mzview to work always use filetype tex
+
+" Syntastic {{{2
+let g:syntastic_c_include_dirs = [ 'include', 'inc', 'test/inc']    " where to find c headers
+let g:syntastic_cpp_include_dirs = [ 'include', 'inc' , 'test/inc'] " where to find c++ headers
+let g:syntastic_cpp_check_header = 1                                " check header files
+let g:syntastic_cpp_compiler_options = ' -std=c++17'                " use c++17
+let g:syntastic_quiet_messages = { "regex" : 'pragma once' }        " ignore pragma warnings
+
+" Automations {{{1
+" OnWrite {{{2
+autocmd BufWritePre * :%s/\s\+$//e  " remove trailing whitespaces
+
+
+
+

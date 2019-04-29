@@ -13,14 +13,22 @@ all: $(LINKS) plugins st-install st-uninstall
 
 .PHONY: all plugins st-install
 
-# TODO switch to ~ before executing and use vpath
+# TODO: switch to ~ before executing and use vpath
 ~/.%:
 	ln -s ~/dotfiles/.$* $@
 	if [ -d "$(HOME)/dotfiles/private/.$*" ]; then \
 		ln -s ~/dotfiles/private/.$*/* ~/.$*/; \
 	fi
 
-plugins: $(VUNDLEDIR)
+# TODO: this should call the generic rule first
+~/.vim:
+	ln -s ~/dotfiles/.vim $@
+	if [ -d "$(HOME)/dotfiles/private/.vim" ]; then \
+		ln -s ~/dotfiles/private/.vim/* ~/.vim/; \
+	fi
+	$(MAKE) vim
+
+vim: $(VUNDLEDIR)
 	vim +PluginUpdate +PluginClean +qa
 	@# PluginUpdate updates the timestamp of $(BUNDLEDIR), thus it is newer
 	@# than $(VUNDLEDIR). Hence, make wants to clone vundle again during the
@@ -29,6 +37,7 @@ plugins: $(VUNDLEDIR)
 	@# Note: it also makes it unnecessary to list $(VUNDLEDIR) as an
 	@# order-only prerequisite, though it actually is one.
 	touch $(VUNDLEDIR)
+	cd ~/.vim && ./gen_stl_tags.sh
 
 $(VUNDLEDIR): $(BUNDLEDIR)
 	git clone https://github.com/gmarik/Vundle.vim.git $@
