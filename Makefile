@@ -9,9 +9,9 @@ ST_PACKAGE = st-git
 ST_FILES = /usr/bin/st /usr/share/doc/st-git/README /usr/share/licenses/st-git/LICENSE /usr/share/man/man1/st.1.gz
 ST_AUR_REPO = https://aur.archlinux.org/st-git.git
 
-all: $(LINKS) plugins st-install st-uninstall
+all: $(LINKS) vim st-install st-uninstall
 
-.PHONY: all plugins st-install
+.PHONY: all st-install
 
 # TODO: switch to ~ before executing and use vpath
 ~/.%:
@@ -20,17 +20,9 @@ all: $(LINKS) plugins st-install st-uninstall
 		ln -s ~/dotfiles/private/.$*/* ~/.$*/; \
 	fi
 
-# TODO: this should call the generic rule first
-~/.vim:
-	ln -s ~/dotfiles/.vim $@
-	if [ -d "$(HOME)/dotfiles/private/.vim" ]; then \
-		ln -s ~/dotfiles/private/.vim/* ~/.vim/; \
-	fi
-	$(MAKE) vim
-
 ~/.gnupg: gnupg
 
-vim: $(VUNDLEDIR)
+vim: $(VUNDLEDIR) ~/.vim
 	vim +PluginUpdate +PluginClean +qa
 	@# PluginUpdate updates the timestamp of $(BUNDLEDIR), thus it is newer
 	@# than $(VUNDLEDIR). Hence, make wants to clone vundle again during the
