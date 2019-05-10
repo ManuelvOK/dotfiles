@@ -33,9 +33,8 @@ source ~/.mutt/gpg.rc
 set crypt_autosign
 message-hook '!(~g|~G) ~b"^-----BEGIN\ PGP\ (SIGNED\ )?MESSAGE"' "exec check-traditional-pgp"
 
-set editor  = 'vim + -c "set filetype=mail"'
 auto_view text/html
-alternative_order text/plain text/enriched text/html
+alternative_order text/enriched text/plain text/html text
 
 bind index G imap-fetch-mail
 
