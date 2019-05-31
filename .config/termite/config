@@ -1,0 +1,57 @@
+[options]
+
+font = Fira Mono 12px
+#font = DejaVu Sans Mono 9
+
+scrollback_lines = 100000
+
+[colors]
+# Base16 Custom Scheme
+# Author: Leon Georgi
+
+foreground          = #f5f5f5
+foreground_bold     = #fafafa
+cursor              = #fafafa
+cursor_foreground   = #212121
+background          = #050505
+
+# 16 color space
+
+# Black, Gray, Silver, White
+color0  = #212121
+color8  = #757575
+color7  = #f5f5f5
+color15 = #ffffff
+
+# Red
+color1  = #EF5350
+color9  = #EF5350
+
+# Green
+color2  = #aae57a
+color10 = #aae57a
+
+# Yellow
+color3  = #FFF176
+color11 = #FFF176
+
+# Blue
+color4  = #82AAFF
+color12 = #82AAFF
+
+# Purple
+color5  = #EA80FC
+color13 = #EA80FC
+
+# Teal
+color6  = #89DDFF
+color14 = #89DDFF
+
+# Extra colors
+color16 = #fc9e5a
+color17 = #FF5370
+color18 = #303030
+color19 = #424242
+color20 = #e0e0e0
+color21 = #fafafa
+

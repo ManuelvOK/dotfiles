@@ -1,2 +1,5 @@
 set guioptions ""
+set filemonitor "signal"
 set incremental-search true
+
+set selection-clipboard clipboard

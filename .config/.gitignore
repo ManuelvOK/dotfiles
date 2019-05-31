@@ -1,0 +1,8 @@
+*
+!.gitignore
+!awesome/
+!awesome/**/*
+!termite/
+!termite/**/*
+!zathura/
+!zathura/**/*
