@@ -1,3 +1,6 @@
 [submodule "private"]
 	path = private
 	url = git@github.com:manuelthieme/dotfiles_private.git
+[submodule ".zsh/zsh-git-prompt"]
+	path = .zsh/zsh-git-prompt
+	url = https://github.com/olivierverdier/zsh-git-prompt
