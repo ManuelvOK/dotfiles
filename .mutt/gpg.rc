@@ -85,4 +85,4 @@ set pgp_good_sign="^\\[GNUPG:\\] GOODSIG"
 set pgp_decryption_okay="^\\[GNUPG:\\] DECRYPTION_OKAY"
 
 # Use gpgme because GPG mailing list says it should be used
-set crypt_use_gpgme
+#set crypt_use_gpgme

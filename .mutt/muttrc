@@ -33,8 +33,11 @@ source ~/.mutt/gpg.rc
 set crypt_autosign
 message-hook '!(~g|~G) ~b"^-----BEGIN\ PGP\ (SIGNED\ )?MESSAGE"' "exec check-traditional-pgp"
 
+set crypt_autosmime = no
+set smime_ask_cert_label = no
+
 auto_view text/html
-alternative_order text/enriched text/plain text/html text
+alternative_order text/plain text/enriched text/html text
 
 bind index G imap-fetch-mail
 
@@ -93,3 +96,6 @@ bind pager                          <Down> next-line
 source ~/.mutt/colors.rc
 set pager_stop
 set index_format='%4C %Z %<[y?%<[m?%<[d?%[%H:%M ]&%[%a %d]>&%[%b %d]>&%[%m/%y ]> %-15.15L (%?l?%4l&%4c?) %s'
+set smart_wrap
+set wrap=120
+unset markers
