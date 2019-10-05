@@ -9,7 +9,11 @@ ST_PACKAGE = st-git
 ST_FILES = /usr/bin/st /usr/share/doc/st-git/README /usr/share/licenses/st-git/LICENSE /usr/share/man/man1/st.1.gz
 ST_AUR_REPO = https://aur.archlinux.org/st-git.git
 
-all: $(LINKS) vim st-install st-uninstall
+DWM_PACKAGE = dwm-git
+DWM_FILES = /usr/bin/dwm /usr/share/doc/dwm-git/README /usr/share/licenses/dwm-git/LICENSE /usr/share/man/man1/dwm.1.gz
+DWM_AUR_REPO = https://aur.archlinux.org/dwm-git.git
+
+all: $(LINKS) vim st-install dwm-install
 
 .PHONY: all st-install
 
@@ -51,3 +55,13 @@ $(ST_FILES): st-pkgbuild.diff st-font-and-colors.diff
 
 st-uninstall:
 	sudo pacman -Runs $(ST_PACKAGE)
+
+dwm-install: $(DWM_FILES)
+
+$(DWM_FILES): dwm-pkgbuild.diff dwm-config.def.h.diff
+	(cd /tmp && [ -d $(DWM_PACKAGE) ] || git clone $(DWM_AUR_REPO))
+	cp dwm-pkgbuild.diff dwm-config.def.h.diff /tmp/$(DWM_PACKAGE)
+	(cd /tmp/$(DWM_PACKAGE) && git apply dwm-pkgbuild.diff; makepkg -fis)
+
+dwm-uninstall:
+	sudo pacman -Runs $(DWM_PACKAGE)

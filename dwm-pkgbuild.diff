@@ -1,0 +1,18 @@
+diff --git a/PKGBUILD b/PKGBUILD
+index d1a0e3c..3d08180 100644
+--- a/PKGBUILD
++++ b/PKGBUILD
+@@ -14,9 +14,11 @@ provides=('dwm')
+ conflicts=('dwm')
+ epoch=1
+ source=(dwm.desktop
+-        "$_pkgname::git+http://git.suckless.org/dwm")
++        "$_pkgname::git+http://git.suckless.org/dwm"
++        "dwm-config.def.h.diff")
+ md5sums=('939f403a71b6e85261d09fc3412269ee'
+-         'SKIP')
++         'SKIP'
++         'e16b65102e5ce211cb06c5255f8fb17e')
+ 
+ pkgver(){
+   cd $_pkgname
