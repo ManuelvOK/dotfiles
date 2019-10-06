@@ -7,12 +7,12 @@ index 877afab..9664e3b 100644
   * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
   */
 -static char *font = "Liberation Mono:pixelsize=12:antialias=true:autohint=true";
-+static char *font = "FantasqueSansMono:pixelsize=17:style=SemiCondensed";
++static char *font = "FiraMono:pixelsize=17:style=SemiCondensed";
  static int borderpx = 2;
- 
+
  /*
 @@ -84,31 +84,31 @@ static unsigned int tabspaces = 8;
- 
+
  /* Terminal colors (16 first used in escape sequence) */
  static const char *colorname[] = {
 -	/* 8 normal colors */
@@ -66,8 +66,8 @@ index 877afab..9664e3b 100644
 +	"#DED9CE",
 +	"#1c1c1c",
  };
- 
- 
+
+
 @@ -117,8 +117,8 @@ const char *colorname[] = {
   * foreground, background, cursor, reverse cursor
   */
@@ -77,5 +77,5 @@ index 877afab..9664e3b 100644
 +unsigned int defaultbg = 257;
 +static unsigned int defaultcs = 7;
  static unsigned int defaultrcs = 257;
- 
+
  /*
