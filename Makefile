@@ -65,3 +65,15 @@ $(DWM_FILES): dwm-pkgbuild.diff dwm-config.def.h.diff
 
 dwm-uninstall:
 	sudo pacman -Runs $(DWM_PACKAGE)
+
+slstatus-install: /bin/slstatus
+
+/bin/slstatus: yay-install
+	yay -S slstatus-git
+
+yay-install: /bin/yay
+
+/bin/yay:
+	(cd /tmp && [ -d yay ] || git clone https://aur.archlinux.org/yay.git)
+	(cd /tmp/yay && makepkg -si)
+
