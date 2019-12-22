@@ -73,6 +73,7 @@ set tabpagemax=25   " display up to 25 tabpages
 
 " controls {{{2
 set mouse=a " use mouse and backspace
+set ttymouse=sgr
 
 " misc {{{2
 set wildignore+=*/build/*,*.d,*.o,main,*/venv/*,*/__pycache__/*,*.pdf,*.out,*.toc,*.fdb_latexmk,*.aux,*.log,*.fls   " ignore these filetypes

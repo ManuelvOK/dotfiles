@@ -5,17 +5,9 @@ LINKS = $(FILES:%=~/%)
 BUNDLEDIR = .vim/bundle
 VUNDLEDIR = $(BUNDLEDIR)/Vundle.vim
 
-ST_PACKAGE = st-git
-ST_FILES = /usr/bin/st /usr/share/doc/st-git/README /usr/share/licenses/st-git/LICENSE /usr/share/man/man1/st.1.gz
-ST_AUR_REPO = https://aur.archlinux.org/st-git.git
-
-DWM_PACKAGE = dwm-git
-DWM_FILES = /usr/bin/dwm /usr/share/doc/dwm-git/README /usr/share/licenses/dwm-git/LICENSE /usr/share/man/man1/dwm.1.gz
-DWM_AUR_REPO = https://aur.archlinux.org/dwm-git.git
-
 all: $(LINKS) vim st-install dwm-install
 
-.PHONY: all st-install
+.PHONY: all vim st-install st-uninstall dwm-install dwm-uninstall slstatus-install slstatus-uninstall yay-install gnupg
 
 # TODO: switch to ~ before executing and use vpath
 ~/.%:
@@ -46,30 +38,32 @@ $(VUNDLEDIR): $(BUNDLEDIR)
 $(BUNDLEDIR):
 	mkdir $@
 
-st-install: $(ST_FILES)
+st-install: /usr/bin/st
 
-$(ST_FILES): st-pkgbuild.diff st-font-and-colors.diff
-	(cd /tmp && [ -d $(ST_PACKAGE) ] || git clone $(ST_AUR_REPO))
-	cp st-pkgbuild.diff st-font-and-colors.diff /tmp/$(ST_PACKAGE)
-	(cd /tmp/$(ST_PACKAGE) && git apply st-pkgbuild.diff; makepkg -fis)
+/usr/bin/st:
+	(cd /tmp && [ -d st ] || git clone https://github.com/manuelthieme/st.git)
+	(cd /tmp/st; makepkg -fis)
 
 st-uninstall:
-	sudo pacman -Runs $(ST_PACKAGE)
+	sudo pacman -Runs st-patched
 
-dwm-install: $(DWM_FILES)
+dwm-install: /usr/bin/dwm
 
-$(DWM_FILES): dwm-pkgbuild.diff dwm-config.def.h.diff
-	(cd /tmp && [ -d $(DWM_PACKAGE) ] || git clone $(DWM_AUR_REPO))
-	cp dwm-pkgbuild.diff dwm-config.def.h.diff /tmp/$(DWM_PACKAGE)
-	(cd /tmp/$(DWM_PACKAGE) && git apply dwm-pkgbuild.diff; makepkg -fis)
+$(DWM_FILES):
+	(cd /tmp && [ -d dwm ] || git clone https://github.com/manuelthieme/dwm.git)
+	(cd /tmp/dwm; makepkg -fis)
 
 dwm-uninstall:
-	sudo pacman -Runs $(DWM_PACKAGE)
+	sudo pacman -Runs dwm-patched
 
-slstatus-install: /bin/slstatus
+slstatus-install: /usr/bin/slstatus
 
-/bin/slstatus: yay-install
-	yay -S slstatus-git
+/usr/bin/slstatus:
+	(cd /tmp && [ -d slstatus ] || git clone https://github.com/manuelthieme/slstatus.git)
+	(cd /tmp/slstatus; makepkg -fis)
+
+slstatus-uninstall:
+	sudo pacman -Runs slstatus-patched
 
 yay-install: /bin/yay
 
