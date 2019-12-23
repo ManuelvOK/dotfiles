@@ -1,6 +1,6 @@
 [options]
 
-font = Fira Mono 13px
+font = Fira Mono 17px
 #font = DejaVu Sans Mono 9
 
 scrollback_lines = 100000
