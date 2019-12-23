@@ -4,3 +4,6 @@
 [submodule ".zsh/zsh-git-prompt"]
 	path = .zsh/zsh-git-prompt
 	url = https://github.com/manuelthieme/zsh-git-prompt.git
+[submodule "scripts/mutt-tools"]
+	path = scripts/mutt-tools
+	url = https://github.com/manuelthieme/mutt-tools.git
