@@ -103,6 +103,8 @@ alias höllidruckt='lpr -P Dellifsr -o media=A4 /home/morion/IFSR/hoelli.jpg'
 
 alias autoremove='sudo pacman -Runs $(pacman -Qdtq)'
 
+alias act='source env/bin/activate'
+
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
