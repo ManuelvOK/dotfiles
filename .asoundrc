@@ -1,0 +1,10 @@
+defaults.ctl.card 1;
+defaults.pcm.card 1;
+
+pcm.!default {
+    type plug
+    slave {
+        pcm "hw:1"
+        channels 2
+    }
+}
