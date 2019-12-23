@@ -1,0 +1,9 @@
+#############################################################
+### Attachment Settings
+#############################################################
+
+set abort_noattach=ask-yes
+#set attach_keyword="attach"
+
+# vim: ft=muttrc
+

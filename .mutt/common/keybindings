@@ -1,0 +1,50 @@
+#################################################
+### Keybindings
+#################################################
+
+bind generic                        l select-entry
+macro index                         h '<change-folder>?'
+bind index,pager                    H display-toggle-weed
+bind pager                          h exit
+bind pager                          j next-line
+bind pager                          k previous-line
+bind pager                          l view-attachments
+bind index                          J next-thread
+bind index                          K previous-thread
+bind attach,browser,index           gg first-entry
+bind attach,browser,index           G last-entry
+bind index,pager                    d noop
+bind index,pager                    dd delete-message
+bind pager                          gg top
+bind pager                          G bottom
+bind pager                          r noop
+bind pager                          rr reply
+bind pager                          rg group-reply
+bind pager                          rl list-reply
+bind index                          \CR toggle-new
+bind index                          "," limit
+bind index                          "'" tag-prefix
+bind index                          l display-message
+bind attach,compose                 l view-attach
+bind attach                         h exit
+bind attach                         H display-toggle-weed
+
+# to allow scrolling in mails
+bind pager                          <Up> previous-line
+bind pager                          <Down> next-line
+
+bind index G imap-fetch-mail
+
+## sidebar
+set meta_key = yes
+bind index,pager B sidebar-toggle-visible
+# Ctrl-n, Ctrl-p to select next, previous folder.
+# Ctrl-o to open selected folder.
+bind index,pager \CP sidebar-prev
+bind index,pager \CN sidebar-next
+bind index,pager \CO sidebar-open
+
+bind index,pager <Pagedown> half-down
+bind index,pager <Pageup> half-up
+
+# vim: ft=muttrc

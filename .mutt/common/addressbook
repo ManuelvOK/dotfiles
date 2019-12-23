@@ -1,0 +1,7 @@
+# aliases
+set alias_file=~/.mutt/aliases
+set sort_alias= alias
+set reverse_alias=yes
+source $alias_file
+
+#vim: filetype=muttrc

@@ -1,0 +1,33 @@
+# HTML mails
+text/html;                  elinks -dump -dump-charset utf-8 %s; nametemplate=%s.html; copiousoutput
+text/html;                  mutt_view firefox %s; nametemplate=%s.html; test=runningx
+text/html;                  elinks %s; nametemplate=%s.html
+
+# MS Office files
+application/word;           mutt_view libreoffice %s; test=runningx
+application/msword;         mutt_view libreoffice %s; test=runningx
+application/vnd.msword;     mutt_view libreoffice %s; test=runningx
+
+application/excel;          mutt_view libreoffice %s; test=runningx
+application/msexcel;        mutt_view libreoffice %s; test=runningx
+application/vnd.msexcel;    mutt_view libreoffice %s; test=runningx
+
+application/powerpoint;     mutt_view libreoffice %s; test=runningx
+application/mspowerpoint;   mutt_view libreoffice %s; test=runningx
+application/vnd.mspowerpoint; mutt_view libreoffice %s; test=runningx
+
+# PDF files
+application/pdf;            mutt_view zathura %s; test=runningx
+
+# Diffs
+text/x-diff;                cat %s | colordiff; copiousoutput
+text/x-patch;               cat %s | colordiff; copiousoutput
+
+# Calendar Events
+text/calendar;              icsviewer %s; copiousoutput
+
+# Pictures
+image/*;                    mutt_view gpicview %s; test=runningx
+
+# vim:ft=mailcap
+

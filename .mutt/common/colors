@@ -1,0 +1,78 @@
+###################################################################
+###  Color Settings
+###################################################################
+
+# basic colors
+color normal        white           default
+color error         brightred       default
+color tilde         white           default
+color message       white           default
+color markers       brightred       default
+color attachment    white           default
+color search        brightmagenta   default
+color status        brightblack     green
+color indicator     black           yellow
+color tree          blue            default
+
+# progress bar -- only in neomutt
+#color progress      black           yellow
+
+# index
+color index         green           default         "~N"                # unread messages
+color index         yellow          default         "~T"                # tagged messages
+color index         red             default         "~D"                # deleted messages
+
+# message headers
+color hdrdefault    green           default
+color header        yellow          default         "^(From)"
+color header        blue            default         "^(Subject)"
+
+# message body
+color quoted        blue            default
+color quoted1       cyan            default
+color quoted2       yellow          default
+color quoted3       red             default
+color quoted4       brightred       default
+
+color signature     brightgreen     default
+color bold          brightwhite     default
+color underline     brightwhite     default
+color normal        default         default
+
+# emoticons
+color body          brightcyan      default         "[;:][-o][)/(|*]"
+color body          brightcyan      default         "[;:][)(|*]"
+color body          brightcyan      default         "[*]?((N)?ACK|CU|LOL|SCNR|BRB|BTW|CWYL|\
+                                                     |FWIW|vbg|GD&R|HTH|HTHBE|IMHO|IMNSHO|\
+                                                     |IRL|RTFM|ROTFL|ROFL|YMMV)[*]?"
+
+# text highlighting
+color body           brightcyan     default         "(^| )[*]+[-a-zA-Z0-9*]+[*]+[,.?]?( |$)"
+color body           brightcyan     default         "(^| )[_]+[-a-zA-Z0-9_]+[_]+[,.?]?( |$)"
+
+# urls, mails, links
+color body          red             default         "(finger|ftp|http|https|news|telnet)://[^ >]*"
+color body          red             default         "<URL:[^ ]*>"
+color body          red             default         "www\\.[-.a-z0-9]+\\.[a-z][a-z][a-z]?([-_./~a-z0-9]+)?"
+color body          yellow          default         "mailto: *[^ ]+\(\\i?subject=[^ ]+\)?"
+color body          yellow          default         "[-a-z_0-9.%$+]+@[-a-z_0-9.]+\\.[-a-z][-a-z]+"
+
+# PGP
+color body          red             default         "(BAD signature)"
+color body          green           default         "(Good signature)"
+color body          green           default         "^gpg: Good signature .*"
+color body          brightyellow    default         "^gpg: "
+color body          red             default         "^gpg: BAD signature from.*"
+
+# diffs
+color body          green           default         "^[\+]([^\+]+.*|$)"
+color body          red             default         "^[\-]([^\-]+.*|$)"
+color body          cyan            default         "^@@ .*"
+color body          brightwhite     default         "^diff \-.*"
+color body          brightwhite     default         "^index [a-f0-9].*"
+color body          brightwhite     default         "^[\-]{3} a.*"
+color body          brightwhite     default         "^[\+]{3} b.*"
+
+source colors_private
+# vim: ft=muttrc
+

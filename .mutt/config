@@ -1,0 +1,37 @@
+#############################################################
+### General Mutt Configuration File
+#############################################################
+
+# Set the base directory
+set my_base_dir=$HOME/.mutt
+
+# Which profile are we currently running
+set my_profile=<profile>
+
+# Which account is currently used.
+set my_account=<account>
+
+# Set configuration directories
+set my_common_dir=$my_base_dir/common
+set my_profiles_dir=$my_base_dir/profiles
+set my_accounts_dir=$my_base_dir/accounts
+set my_foldertypes_dir=$my_base_dir/foldertypes
+
+set my_account_dir=$my_accounts_dir/$my_account
+
+#########################
+# General Settings
+#########################
+source $my_common_dir/general
+
+#########################
+# Account Settings
+#########################
+source $my_account_dir/general
+
+#########################
+# Profile settings
+#########################
+source $my_profiles_dir/$my_profile
+
+# vim: ft=muttrc

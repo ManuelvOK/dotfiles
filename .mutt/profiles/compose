@@ -1,0 +1,49 @@
+#############################################################
+### Compose-Mode Settings
+#############################################################
+
+# Behavioral settings
+set resume_draft_files      # Do not ask for subject and recepient for draft files
+set autoedit
+set edit_headers
+set editor='vim -c "set filetype=mail" -c "set fo+=aw" -c "set nojs" -c "set nosmartindent" -c "normal }"'
+
+set copy=yes                # Save copies of send mails
+
+#########################
+# Header Settings
+#########################
+source $my_common_dir/headers
+
+#########################
+# Address Book Settings
+#########################
+source $my_common_dir/addressbook
+
+#########################
+# Encryption and signatures
+#########################
+source $my_common_dir/gpg
+
+#########################
+# MSMTP settings
+#########################
+source $my_common_dir/sending
+
+#########################
+# Keybindings and Macros
+#########################
+source $my_common_dir/keybindings
+
+#########################
+# Format Settings
+#########################
+source $my_common_dir/formatting
+
+#########################
+# Color Settings
+#########################
+source $my_common_dir/colors
+
+# vim: ft=muttrc
+

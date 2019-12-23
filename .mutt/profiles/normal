@@ -1,0 +1,115 @@
+#############################################################
+### Normal-Mode Settings
+#############################################################
+
+# Behavioral settings
+set editor="mutt_compose $my_account %s"
+set edit_headers
+set text_flowed = yes
+set ispell = 'aspell -e -c'
+
+set copy=yes                # Save sent messages
+set forward_quote           # Quote the email body when forwarding
+set include                 # Quote the email body when replying
+set reverse_name            # Reply with the address used in the TO/CC header
+set reverse_realname        # Reply with the name used in the TO/CC header
+set reverse_alias           # Show alias name instead of the mail
+
+set imap_check_subscribed
+set imap_keepalive = 300
+set mail_check=60           # Check for new mail every 60 seconds.
+set timeout=60              # Only wait 60 seconds in menus or other interactive operations
+
+set ssl_force_tls = yes
+set ssl_starttls = yes
+
+set crypt_autosmime = no
+set smime_ask_cert_label = no
+
+set pager_index_lines=15    # Show 15 message headers from your message index above an email you are reading
+set pager_context=5         # Retain 5 lines of previous page when scrolling.
+set pager_stop
+
+set narrow_tree             # Use a smaller tree structure for threads
+
+unset collapse_unread       # Do not collapse threads with unread mails
+unset mark_old              # Do not mark messages as "Old"
+
+unset prompt_after          # Do not ask for a key after an external pager exited
+
+set abort_noattach = ask-yes
+
+message-hook '!(~g|~G) ~b"^-----BEGIN\ PGP\ (SIGNED\ )?MESSAGE"' "exec check-traditional-pgp"
+
+set sort = threads
+set sort_aux = reverse-last-date
+set nomark_old
+
+# Also automatically view various other files
+auto_view text/html
+auto_view text/x-diff text/x-patch
+auto_view text/calendar
+
+
+########################
+# General Account Settings
+########################
+source $my_common_dir/accounts
+
+#########################
+# Header Settings
+#########################
+source $my_common_dir/headers
+
+#########################
+# Address Book Settings
+#########################
+source $my_common_dir/addressbook
+
+#########################
+# Mailcap
+########################
+set mailcap_path="$my_common_dir/mailcap"
+
+#########################
+# Encryption and Signatures
+#########################
+source $my_common_dir/gpg
+
+#########################
+# Sidebar Settings
+#########################
+source $my_common_dir/sidebar
+
+#########################
+# MSMTP Settings
+#########################
+source $my_common_dir/sending
+
+#########################
+# Keybindings and Macros
+#########################
+source $my_common_dir/keybindings
+
+#########################
+# Tools
+#########################
+source $my_common_dir/search
+source $my_common_dir/urls
+
+#########################
+# Format Settings
+#########################
+source $my_common_dir/formatting
+
+#########################
+# Color Settings
+#########################
+source $my_common_dir/colors
+
+#########################
+# Enable Foldertypes (must be last)
+#########################
+source $my_common_dir/foldertypes
+
+# vim: ft=muttrc

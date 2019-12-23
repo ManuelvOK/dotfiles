@@ -1,6 +1,9 @@
 *
-!colors.rc
-!gpg.rc
+!common
+!common/**/*
+common/private_colors
+!config
+!profiles
+!profiles/**/*
 !mailcap
-!muttrc
 !.gitignore

@@ -7,7 +7,7 @@ VUNDLEDIR = $(BUNDLEDIR)/Vundle.vim
 
 all: $(LINKS) vim st-install dwm-install
 
-.PHONY: all vim st-install st-uninstall dwm-install dwm-uninstall slstatus-install slstatus-uninstall yay-install gnupg
+.PHONY: all vim st-install st-uninstall dwm-install dwm-uninstall slstatus-install slstatus-uninstall yay-install gnupg mutt-private
 
 # TODO: switch to ~ before executing and use vpath
 ~/.%:
@@ -71,3 +71,10 @@ yay-install: /bin/yay
 	(cd /tmp && [ -d yay ] || git clone https://aur.archlinux.org/yay.git)
 	(cd /tmp/yay && makepkg -si)
 
+mutt-private: ~/.mutt/accounts ~/.mutt/common/private_colors
+
+~/.mutt/accounts: ~/.mutt
+	ln -s ~/dotfiles/private/.mutt/accounts ~/.mutt/accounts
+
+~/.mutt/common/private_colors: ~/.mutt
+	ln -s ~/dotfiles/private/.mutt/colors ~/.mutt/common/private_colors

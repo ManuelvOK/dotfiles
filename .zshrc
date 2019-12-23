@@ -94,7 +94,10 @@ manuel.thieme@tu-dresden.de
 
 alias cups='sm "631"'
 
-alias mutt='neomutt'
+# mutt aliases
+alias mutt='mutt_profile normal ifsr'
+alias muttt='mutt_profile normal tu-dresden'
+alias muttm='mutt_profile normal manuel-thieme'
 
 alias höllidruckt='lpr -P Dellifsr -o media=A4 /home/morion/IFSR/hoelli.jpg'
 
@@ -104,7 +107,10 @@ if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
 
-export PATH=$PATH:/home/morion/.gem/ruby/2.2.0/bin
 export PINENTRY_USER_DATA="curses"
+typeset -U PATH path
+path=($path ~/.gem/ruby/2.2.0/bin)
+path=($path ~/dotfiles/scripts)
+path=($path ~/dotfiles/scripts/mutt-tools)
 export GPG_TTY=`tty`
 gpg-connect-agent updatestartuptty /bye >/dev/null

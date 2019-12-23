@@ -1,0 +1,34 @@
+###################################################################
+###  General Settings
+###################################################################
+
+set my_name="Manuel Thieme"
+set realname="Manuel Thieme"
+
+#set mbox_type=Maildir
+#set folder=~/.mail
+
+set charset=utf-8
+
+set status_on_top           # Status bar on top.
+unset wait_key              # Don't ask to press a key
+
+set smart_wrap              # Try to wrap lines at word bounderies
+set markers                 # Mark wrapped lines with "+"
+set tilde                   # Pad empty lines with "~"
+
+set sig_dashes              # A signature must always start with a "-- "
+
+set mail_check_stats
+set mail_check_stats_interval=60
+
+set smart_wrap
+set wrap=120
+unset markers
+
+set pager_stop
+
+# set a default foldertype for the account
+#folder-hook '.*'     'set my_foldertype=default'
+
+# vim: ft=muttrc
