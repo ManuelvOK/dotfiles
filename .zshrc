@@ -105,5 +105,6 @@ if [ -f ~/.bash_aliases ]; then
 fi
 
 export PATH=$PATH:/home/morion/.gem/ruby/2.2.0/bin
+export PINENTRY_USER_DATA="curses"
 export GPG_TTY=`tty`
 gpg-connect-agent updatestartuptty /bye >/dev/null
