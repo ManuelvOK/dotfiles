@@ -2,9 +2,6 @@
 ### General Account Settings
 ################################################
 
-# Header Cache
-set header_cache="$my_account_dir/headercache"
-
 # Mailboxes
 source $my_account_dir/mailboxes
 

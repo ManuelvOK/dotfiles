@@ -73,6 +73,6 @@ color body          brightwhite     default         "^index [a-f0-9].*"
 color body          brightwhite     default         "^[\-]{3} a.*"
 color body          brightwhite     default         "^[\+]{3} b.*"
 
-source colors_private
+source $my_common_dir/private_colors
 # vim: ft=muttrc
 
