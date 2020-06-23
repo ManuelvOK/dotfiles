@@ -1,5 +1,6 @@
 # HTML mails
-text/html;                  elinks -dump -dump-charset utf-8 %s; nametemplate=%s.html; copiousoutput
+text/html;                  w3m -I %{charset} -T text/html; copiousoutput;
+#text/html;                  elinks -dump -dump-charset utf-8 %s; nametemplate=%s.html; copiousoutput
 text/html;                  mutt_view firefox %s; nametemplate=%s.html; test=runningx
 text/html;                  elinks %s; nametemplate=%s.html
 

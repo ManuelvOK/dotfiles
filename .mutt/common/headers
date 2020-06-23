@@ -2,15 +2,15 @@
 ### Header Settings
 #############################################################
 
-ignore *
-unignore From:
-unignore To:
-unignore Reply-To:
-unignore Subject:
-unignore Date:
-unignore CC:
-unignore BCC:
-
-hdr_order From: To: Reply-To: CC: Date: Subject:
+#ignore *
+#unignore From:
+#unignore To:
+#unignore Reply-To:
+#unignore Subject:
+#unignore Date:
+#unignore CC:
+#unignore BCC:
+#
+#hdr_order From: To: Reply-To: CC: Date: Subject:
 
 # vim: ft=muttrc

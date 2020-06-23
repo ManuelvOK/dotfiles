@@ -20,9 +20,6 @@ set imap_keepalive = 300
 set mail_check=60           # Check for new mail every 60 seconds.
 set timeout=60              # Only wait 60 seconds in menus or other interactive operations
 
-set ssl_force_tls = yes
-set ssl_starttls = yes
-
 set crypt_autosmime = no
 set smime_ask_cert_label = no
 

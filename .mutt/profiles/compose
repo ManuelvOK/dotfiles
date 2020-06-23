@@ -7,6 +7,7 @@ set resume_draft_files      # Do not ask for subject and recepient for draft fil
 set autoedit
 set edit_headers
 set editor='vim -c "set filetype=mail" -c "set fo+=aw" -c "set nojs" -c "set nosmartindent" -c "normal }"'
+set text_flowed=yes
 
 set copy=yes                # Save copies of send mails
 
