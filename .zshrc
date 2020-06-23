@@ -105,6 +105,8 @@ alias autoremove='sudo pacman -Runs $(pacman -Qdtq)'
 
 alias act='source env/bin/activate'
 
+alias forget='echo RELOADAGENT | gpg-connect-agent'
+
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
