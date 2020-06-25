@@ -76,7 +76,7 @@ set mouse=a " use mouse and backspace
 set ttymouse=sgr
 
 " misc {{{2
-set wildignore+=*/build/*,*.d,*.o,main,*/venv/*,*/__pycache__/*,*.pdf,*.out,*.toc,*.fdb_latexmk,*.aux,*.log,*.fls   " ignore these filetypes
+set wildignore+=*/build/*,*.d,*.o,main,*/venv/*,*/__pycache__/*,*.pdf,*.out,*.toc,*.fdb_latexmk,*.aux,*.log,*.fls,*/doc/*   " ignore these filetypes
 
 " Completion {{{1
 " Command line completion {{{2
@@ -130,6 +130,10 @@ augroup END
 
 " CtrlP {{{2
 let g:ctrlp_root_markers = ["tags", ".git"] " proper pathfinding
+let g:ctrlp_prompt_mappings = {
+            \   'PrtClearCache()':  ['<C-I>'],
+            \ }
+
 
 " Pathfinder.vim {{{2
 let g:pathfinder_targets = ["tags", ".git"] " pathfinder heuristic
@@ -140,11 +144,18 @@ nnoremap gp :SynctexForward<CR>
 let g:tex_flavor = "latex" " for mzview to work always use filetype tex
 
 " Syntastic {{{2
-let g:syntastic_c_include_dirs = [ 'include', 'inc', 'test/inc']    " where to find c headers
-let g:syntastic_cpp_include_dirs = [ 'include', 'inc' , 'test/inc'] " where to find c++ headers
+let g:syntastic_c_no_default_include_dirs = 1                       " get rid of -I..
+let g:syntastic_cpp_no_default_include_dirs = 1                     " get rid of -I..
+let g:syntastic_c_include_dirs = [ 'include', 'inc', 'test/inc', 'lib']    " where to find c headers
+let g:syntastic_cpp_include_dirs = [ 'include', 'inc' , 'test/inc', 'lib'] " where to find c++ headers
 let g:syntastic_cpp_check_header = 1                                " check header files
-let g:syntastic_cpp_compiler_options = ' -std=c++17'                " use c++17
+let g:syntastic_cpp_compiler_options = ' -std=c++2a'                " use c++17
 let g:syntastic_quiet_messages = { "regex" : 'pragma once' }        " ignore pragma warnings
+let g:syntastic_always_populate_loc_list = 1
+
+" OmniCppComplete {{{2
+let OmniCpp_MayCompleteDot = 0      " Do not automatically start completion on dot
+let OmniCpp_MayCompleteArrow = 0    " Do not automatically start completion on arrow
 
 " Automations {{{1
 " OnWrite {{{2
@@ -158,3 +169,7 @@ let g:netrw_altv = 1
 let g:netrw_winsize = 15
 
 nnoremap <C-K> :Vexplore<CR>
+
+" Allow projectspecific .vimrcs but safely
+set exrc
+set secure
