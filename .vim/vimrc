@@ -23,6 +23,7 @@ call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
 Plugin 'vim-syntastic/syntastic'
 Plugin 'tpope/vim-endwise'
+Plugin 'tpope/vim-unimpaired'
 Plugin 'justinmk/vim-syntax-extra'
 Plugin 'pboettch/vim-highlight-cursor-words'
 Plugin 'lodifice/omnitags.vim'
@@ -34,6 +35,7 @@ Plugin 'lodifice/wombat256.vim'
 Plugin 'kien/ctrlp.vim'
 Plugin 'kdrakon/AnswerSetProgramming-VIM-Syntax-Highlighting'
 Plugin 'FromtonRouge/OmniCppComplete'
+Plugin 'Vimjas/vim-python-pep8-indent'
 " }}}2
 call vundle#end()
 " }}}1
@@ -129,10 +131,15 @@ augroup guillotine
 augroup END
 
 " CtrlP {{{2
-let g:ctrlp_root_markers = ["tags", ".git"] " proper pathfinding
-let g:ctrlp_prompt_mappings = {
+let g:ctrlp_switch_buffer       = 0                     " do not jump if already open
+let g:ctrlp_show_hidden         = 1                     " show hidden files
+let g:ctrlp_clear_cache_on_exit = 0                     " do not clear cache at exit
+let g:ctrlp_cache_dir           = $HOME.'/.cache/ctrlp' " where to save the cache
+let g:ctrlp_root_markers        = ["tags", ".git"]      " proper pathfinding
+let g:ctrlp_prompt_mappings     = {
             \   'PrtClearCache()':  ['<C-I>'],
-            \ }
+            \ }                                         " reload with Ctrl-I
+
 
 
 " Pathfinder.vim {{{2
@@ -152,6 +159,9 @@ let g:syntastic_cpp_check_header = 1                                " check head
 let g:syntastic_cpp_compiler_options = ' -std=c++2a'                " use c++17
 let g:syntastic_quiet_messages = { "regex" : 'pragma once' }        " ignore pragma warnings
 let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_lua_checkers = ["luac"]
+let g:syntastic_lua_luacheck_args = "--no-unused-args"
+let g:syntastic_python_checkers = ["pycodestyle"]
 
 " OmniCppComplete {{{2
 let OmniCpp_MayCompleteDot = 0      " Do not automatically start completion on dot
@@ -169,6 +179,8 @@ let g:netrw_altv = 1
 let g:netrw_winsize = 15
 
 nnoremap <C-K> :Vexplore<CR>
+
+nnoremap K i<CR><Esc>
 
 " Allow projectspecific .vimrcs but safely
 set exrc
