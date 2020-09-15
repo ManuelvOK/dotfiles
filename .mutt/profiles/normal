@@ -15,8 +15,6 @@ set reverse_name            # Reply with the address used in the TO/CC header
 set reverse_realname        # Reply with the name used in the TO/CC header
 set reverse_alias           # Show alias name instead of the mail
 
-set imap_check_subscribed
-set imap_keepalive = 300
 set mail_check=60           # Check for new mail every 60 seconds.
 set timeout=60              # Only wait 60 seconds in menus or other interactive operations
 
@@ -37,10 +35,6 @@ unset prompt_after          # Do not ask for a key after an external pager exite
 set abort_noattach = ask-yes
 
 message-hook '!(~g|~G) ~b"^-----BEGIN\ PGP\ (SIGNED\ )?MESSAGE"' "exec check-traditional-pgp"
-
-set sort = threads
-set sort_aux = reverse-last-date
-set nomark_old
 
 # Also automatically view various other files
 auto_view text/html

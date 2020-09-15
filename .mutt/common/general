@@ -5,8 +5,8 @@
 set my_name="Manuel Thieme"
 set realname="Manuel Thieme"
 
-#set mbox_type=Maildir
-#set folder=~/.mail
+set mbox_type=Maildir
+set folder=~/Maildir
 
 set charset=utf-8
 
@@ -29,6 +29,6 @@ unset markers
 set pager_stop
 
 # set a default foldertype for the account
-#folder-hook '.*'     'set my_foldertype=default'
+folder-hook '.*'     'set my_foldertype=default'
 
 # vim: ft=muttrc

@@ -3,7 +3,7 @@
 #################################################
 
 bind generic                        l select-entry
-macro index                         h '<change-folder>?'
+bind index                          h sidebar-toggle-visible
 bind index,pager                    H display-toggle-weed
 bind pager                          h exit
 bind pager                          j next-line
@@ -28,6 +28,12 @@ bind index                          l display-message
 bind attach,compose                 l view-attach
 bind attach                         h exit
 bind attach                         H display-toggle-weed
+bind index                          G imap-fetch-mail
+bind index,pager                    <Pagedown> half-down
+bind index,pager                    <Pageup> half-up
+
+# Open attachment
+bind attach                         <enter> view-mailcap
 
 # to allow scrolling in mails
 bind pager                          <Up> previous-line
@@ -39,17 +45,19 @@ bind pager                          \CY previous-line
 bind index                          \CE next-entry
 bind index                          \CY previous-entry
 
-bind index G imap-fetch-mail
-
 ## sidebar
-bind index,pager B sidebar-toggle-visible
-# Ctrl-n, Ctrl-p to select next, previous folder.
-# Ctrl-o to open selected folder.
-bind index,pager \CP sidebar-prev
-bind index,pager \CN sidebar-next
-bind index,pager \CO sidebar-open
+bind index,pager                    \Ch sidebar-toggle-visible
+bind index,pager                    \Ck sidebar-prev
+bind index,pager                    \Cj sidebar-next
+bind index,pager                    \Cl sidebar-open
 
-bind index,pager <Pagedown> half-down
-bind index,pager <Pageup> half-up
+# Saner copy/move dialogs
+macro index                         C "<copy-message>?<toggle-mailboxes>" "copy a message to a mailbox"
+macro index                         M "<save-message>?<toggle-mailboxes>" "move a message to a mailbox"
+
+# 'L' performs a notmuch query, showing only the results
+macro index \C_ "<enter-command>unset wait_key<enter><shell-escape>read -p 'notmuch query: ' x; echo \$x >~/.cache/mutt_terms<enter><limit>~i \"\`notmuch search --output=messages \$(cat ~/.cache/mutt_terms) | head -n 600 | perl -le '@a=<>;chomp@a;s/\^id:// for@a;$,=\"|\";print@a'\`\"<enter>" "show only messages matching a notmuch pattern"
+# 'a' shows all messages again (supersedes default <alias> binding)
+macro index \Ca "<limit>all\n" "show all messages (undo limit)"
 
 # vim: ft=muttrc

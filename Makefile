@@ -5,7 +5,7 @@ LINKS = $(FILES:%=~/%)
 BUNDLEDIR = .vim/bundle
 VUNDLEDIR = $(BUNDLEDIR)/Vundle.vim
 
-all: $(LINKS) vim st-install dwm-install
+all: $(LINKS) vim st-install dwm-install slstatus-install
 
 .PHONY: all vim st-install st-uninstall dwm-install dwm-uninstall slstatus-install slstatus-uninstall yay-install gnupg mutt-private
 
@@ -49,7 +49,7 @@ st-uninstall:
 
 dwm-install: /usr/bin/dwm
 
-$(DWM_FILES):
+/usr/bin/dwm:
 	(cd /tmp && [ -d dwm ] || git clone https://github.com/manuelthieme/dwm.git)
 	(cd /tmp/dwm; makepkg -fis)
 
@@ -71,10 +71,10 @@ yay-install: /bin/yay
 	(cd /tmp && [ -d yay ] || git clone https://aur.archlinux.org/yay.git)
 	(cd /tmp/yay && makepkg -si)
 
-mutt-private: ~/.mutt/accounts ~/.mutt/common/private_colors
+PRIVATE_MUTT_LINKS = $(HOME)/.mutt/accounts $(HOME)/.mutt/common/private_colors \
+                     $(HOME)/.mutt/aliases $(HOME)/.mutt/foldertypes
 
-~/.mutt/accounts: ~/.mutt
-	ln -s ~/dotfiles/private/.mutt/accounts ~/.mutt/accounts
+mutt-private: $(PRIVATE_MUTT_LINKS)
 
-~/.mutt/common/private_colors: ~/.mutt
-	ln -s ~/dotfiles/private/.mutt/colors ~/.mutt/common/private_colors
+$(PRIVATE_MUTT_LINKS): $(HOME)/.mutt/%: $(HOME)/dotfiles/private/.mutt/% | $(HOME)/.mutt
+	ln -s $< $@

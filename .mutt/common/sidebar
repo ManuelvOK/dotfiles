@@ -1,0 +1,42 @@
+###################################################################
+###  Sidebar Settings
+###################################################################
+
+#########################
+# Appearance settings
+#########################
+set sidebar_width=20            # The width of the sidebar.
+set sidebar_divider_char='|'    # The separator between the sidebar and the rest.
+set sidebar_delim_chars='/.'    # The character used to separate folders.
+set sidebar_folder_indent       # Indent sub-folders of the same mailbox.
+set sidebar_indent_string=" "   # The string used to indent sub-folders.
+set sidebar_short_path          # Only display the name of the last folder and not the whole path.
+set sidebar_visible             # Display the sidebar.
+set sidebar_sort_method=unsorted# Display the folders in the sidebar as they are given in the mailboxes file.
+set sidebar_next_new_wrap
+unset sidebar_new_mail_only     # Always show all folders in the sidebar
+
+set sidebar_format="%B%* %?N?%N/?%S"
+set status_chars  = " *%A"
+
+#########################
+# Color settings
+#########################
+color sidebar_divider       brightblack green
+color sidebar_indicator     black       yellow
+color sidebar_highlight     black       green
+color sidebar_new           yellow      default
+#color sidebar_spoolfile     default     default
+
+#########################
+# Keybindings
+#########################
+bind pager,index    \Cp         sidebar-prev
+bind pager,index    \Cn         sidebar-next
+bind pager,index    \Co         sidebar-open
+bind pager,index    \Cu         sidebar-next-new
+
+macro pager,index    \Ce        '<enter-command>toggle side_visible<enter>'     "Toggle sidebar"
+
+
+# vim:ft=muttrc

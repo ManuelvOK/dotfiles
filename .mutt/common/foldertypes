@@ -1,0 +1,8 @@
+################################################
+### Foldertypes Setup
+################################################
+
+# Activate the given foldertype
+folder-hook '.*'    'source $my_foldertypes_dir/$my_foldertype'
+
+# vim: ft=muttrc
