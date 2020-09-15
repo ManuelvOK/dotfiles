@@ -36,6 +36,7 @@ Plugin 'kien/ctrlp.vim'
 Plugin 'kdrakon/AnswerSetProgramming-VIM-Syntax-Highlighting'
 Plugin 'FromtonRouge/OmniCppComplete'
 Plugin 'Vimjas/vim-python-pep8-indent'
+Plugin 'preservim/nerdtree'
 " }}}2
 call vundle#end()
 " }}}1
@@ -77,8 +78,11 @@ set tabpagemax=25   " display up to 25 tabpages
 set mouse=a " use mouse and backspace
 set ttymouse=sgr
 
+" break a line
+nnoremap K i<CR><Esc>
+
 " misc {{{2
-set wildignore+=*/build/*,*.d,*.o,main,*/venv/*,*/__pycache__/*,*.pdf,*.out,*.toc,*.fdb_latexmk,*.aux,*.log,*.fls,*/doc/*   " ignore these filetypes
+set wildignore+=*/build/*,*.d,*.o,main,*/venv/*,*/__pycache__/*,*.pdf,*.out,*.toc,*.fdb_latexmk,*.aux,*.log,*.fls ",*/doc/*   " ignore these filetypes
 
 " Completion {{{1
 " Command line completion {{{2
@@ -140,8 +144,6 @@ let g:ctrlp_prompt_mappings     = {
             \   'PrtClearCache()':  ['<C-I>'],
             \ }                                         " reload with Ctrl-I
 
-
-
 " Pathfinder.vim {{{2
 let g:pathfinder_targets = ["tags", ".git"] " pathfinder heuristic
 
@@ -149,6 +151,18 @@ let g:pathfinder_targets = ["tags", ".git"] " pathfinder heuristic
 " goto position in pdf
 nnoremap gp :SynctexForward<CR>
 let g:tex_flavor = "latex" " for mzview to work always use filetype tex
+
+" NERDTree {{{2
+" toggle NERDTree
+function! ToggleNERDTree()
+    if @% == ""
+        NERDTreeToggle
+    else
+        NERDTreeFind
+    endif
+endfunction
+
+nnoremap <C-K> :call ToggleNERDTree()<CR>
 
 " Syntastic {{{2
 let g:syntastic_c_no_default_include_dirs = 1                       " get rid of -I..
@@ -161,7 +175,7 @@ let g:syntastic_quiet_messages = { "regex" : 'pragma once' }        " ignore pra
 let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_lua_checkers = ["luac"]
 let g:syntastic_lua_luacheck_args = "--no-unused-args"
-let g:syntastic_python_checkers = ["pycodestyle"]
+let g:syntastic_python_checkers = ["pycodestyle", "mypy"]
 
 " OmniCppComplete {{{2
 let OmniCpp_MayCompleteDot = 0      " Do not automatically start completion on dot
@@ -170,17 +184,6 @@ let OmniCpp_MayCompleteArrow = 0    " Do not automatically start completion on a
 " Automations {{{1
 " OnWrite {{{2
 autocmd BufWritePre * :%s/\s\+$//e  " remove trailing whitespaces
-
-
-let g:netrw_banner = 0
-let g:netrw_liststyle = 3
-let g:netrw_browse_split = 4
-let g:netrw_altv = 1
-let g:netrw_winsize = 15
-
-nnoremap <C-K> :Vexplore<CR>
-
-nnoremap K i<CR><Esc>
 
 " Allow projectspecific .vimrcs but safely
 set exrc
