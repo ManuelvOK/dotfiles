@@ -33,10 +33,15 @@ bind attach                         H display-toggle-weed
 bind pager                          <Up> previous-line
 bind pager                          <Down> next-line
 
+# st scrolling
+bind pager                          \CE next-line
+bind pager                          \CY previous-line
+bind index                          \CE next-entry
+bind index                          \CY previous-entry
+
 bind index G imap-fetch-mail
 
 ## sidebar
-set meta_key = yes
 bind index,pager B sidebar-toggle-visible
 # Ctrl-n, Ctrl-p to select next, previous folder.
 # Ctrl-o to open selected folder.
