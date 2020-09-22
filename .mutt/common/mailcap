@@ -17,6 +17,9 @@ application/powerpoint;     mutt_view libreoffice %s;
 application/mspowerpoint;   mutt_view libreoffice %s;
 application/vnd.mspowerpoint; mutt_view libreoffice %s;
 
+# libreoffice files
+application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; mutt_view libreoffice %s;
+
 # PDF files
 application/pdf;            mutt_view zathura %s;
 
