@@ -1,0 +1,12 @@
+[user]
+	email = info@manuel-thieme.de
+	name = manuelvok
+[alias]
+	co = checkout
+	br = branch
+	ci = commit
+	st = status
+[diff]
+	tool = vimdiff
+[merge]
+	tool = vimdiff
