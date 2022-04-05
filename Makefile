@@ -1,5 +1,5 @@
-IGNORE = .git
-FILES = $(filter-out $(IGNORE), $(wildcard .*))
+IGNORE = .git .gitmodules
+FILES = $(filter-out $(IGNORE), $(wildcard .*) $(patsubst private/%,%,$(wildcard private/.*)))
 LINKS = $(FILES:%=~/%)
 
 BUNDLEDIR = .vim/bundle
@@ -7,11 +7,17 @@ VUNDLEDIR = $(BUNDLEDIR)/Vundle.vim
 
 all: $(LINKS) vim st-install dwm-install slstatus-install
 
+links: $(LINKS)
+
 .PHONY: all vim st-install st-uninstall dwm-install dwm-uninstall slstatus-install slstatus-uninstall yay-install gnupg mutt-private
 
 # TODO: switch to ~ before executing and use vpath
 ~/.%:
-	ln -s ~/dotfiles/.$* $@
+	if [ -f "$(HOME)/dotfiles/.$*" ]; then \
+		ln -s ~/dotfiles/.$* $@ ; \
+	elif [ -f "$(HOME)/dotfiles/private/.$*" ]; then \
+		ln -s ~/dotfiles/private/.$* $@ ; \
+	fi; \
 	if [ -d "$(HOME)/dotfiles/private/.$*" ]; then \
 		ln -s ~/dotfiles/private/.$*/* ~/.$*/; \
 	fi
