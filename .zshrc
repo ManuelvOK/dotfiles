@@ -1,11 +1,21 @@
+# include git prompt
 source ~/.zsh/zsh-git-prompt/zshrc.sh
+
+# include vi mode
+source ~/.zsh/zsh-vi-mode/zsh-vi-mode.zsh
+ZVM_LINE_INIT_MODE=$ZVM_MODE_INSERT
+
+setopt interactivecomments
 zstyle ':completion:*:*:git:*' script /usr/share/git/completion/git-completion.zsh
 # Lines configured by zsh-newuser-install
 HISTFILE=~/.histfile
-HISTSIZE=1000
-SAVEHIST=1000
+HISTSIZE=10000000
+SAVEHIST=10000000
+setopt hist_ignore_all_dups
 setopt autocd
-bindkey -v
+
+bindkey "e[3~" delete-char
+
 # End of lines configured by zsh-newuser-install
 # The following lines were added by compinstall
 zstyle :compinstall filename '/home/morion/.zshrc'
@@ -67,6 +77,8 @@ alias apb-e069='xrandr --output VGA1 --mode 1400x1050 --right-of LVDS1'
 # beamer at E067
 alias apb-e067='xrandr --output VGA1 --mode 1280x1024 --right-of LVDS1'
 
+alias homeoffice='xrandr --output DisplayPort-2 --mode 2560x1440 --pos 0x0 --primary --output eDP --pos 320x1440'
+
 # yogurt
 alias yogurt='yay -Syu'
 
@@ -97,7 +109,9 @@ alias cups='sm "631"'
 # mutt aliases
 alias mutt='mutt_profile normal ifsr'
 alias muttt='mutt_profile normal tu-dresden'
-alias muttm='mutt_profile normal manuel-thieme'
+alias muttm='mutt_profile normal manuel-kalettka'
+alias muttk='mutt_profile normal kernkonzept'
+alias muttkm='mutt_profile normal kin-music'
 
 alias höllidruckt='lpr -P Dellifsr -o media=A4 /home/morion/IFSR/hoelli.jpg'
 

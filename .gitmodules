@@ -1,9 +1,12 @@
 [submodule "private"]
 	path = private
-	url = https://github.com/manuelthieme/dotfiles_private.git
+	url = git@github.com:manuelthieme/dotfiles_private.git
 [submodule ".zsh/zsh-git-prompt"]
 	path = .zsh/zsh-git-prompt
 	url = https://github.com/manuelthieme/zsh-git-prompt.git
 [submodule "scripts/mutt-tools"]
 	path = scripts/mutt-tools
 	url = https://github.com/manuelthieme/mutt-tools.git
+[submodule ".zsh/zsh-vi-mode"]
+	path = .zsh/zsh-vi-mode
+	url = https://github.com/jeffreytse/zsh-vi-mode

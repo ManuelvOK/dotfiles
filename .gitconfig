@@ -2,11 +2,18 @@
 	email = info@manuel-thieme.de
 	name = manuelvok
 [alias]
-	co = checkout
-	br = branch
-	ci = commit
-	st = status
+    co = checkout
+    br = branch
+    ci = commit
+    st = status
 [diff]
-	tool = vimdiff
+    tool = vimdiff
 [merge]
-	tool = vimdiff
+    tool = vimdiff
+[push]
+    default = tracking
+[core]
+    editor = vim
+    excludesFile = ~/dotfiles/.gitignore_global
+[advice]
+    detachedHead = false

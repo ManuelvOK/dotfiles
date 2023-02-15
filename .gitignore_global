@@ -1,0 +1,5 @@
+.vimrc
+__pycache__/
+.mypy_cache/
+*.orig
+.tags

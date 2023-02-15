@@ -4,8 +4,8 @@
 
 bind generic                        l select-entry
 bind index                          h sidebar-toggle-visible
-bind index,pager                    H display-toggle-weed
-bind pager                          h exit
+bind index,pager,attach             H display-toggle-weed
+bind pager,attach                   h exit
 bind pager                          j next-line
 bind pager                          k previous-line
 bind pager                          l view-attachments
@@ -25,12 +25,11 @@ bind index                          \CR toggle-new
 bind index                          "," limit
 bind index                          "'" tag-prefix
 bind index                          l display-message
-bind attach,compose                 l view-attach
-bind attach                         h exit
-bind attach                         H display-toggle-weed
-bind index                          G imap-fetch-mail
+bind attach,compose                 l view-mailcap
 bind index,pager                    <Pagedown> half-down
 bind index,pager                    <Pageup> half-up
+bind index                          za collapse-thread
+bind index                          zA collapse-all
 
 # Open attachment
 bind attach                         <enter> view-mailcap

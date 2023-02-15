@@ -1,5 +1,4 @@
-xset r rate 300 55
-#xmodmap /home/morion/.xmodmap
-setxkbmap -option 'ctrl:nocaps'
+~/dotfiles/scripts/rescreen.sh
+xrdb -merge ~/.Xresources
 slstatus &
 exec dwm

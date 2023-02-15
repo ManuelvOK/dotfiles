@@ -1,0 +1,1 @@
+set index_format = " %4C %Z %{%b %d} %-15.15L %?M?++&  ? %s"

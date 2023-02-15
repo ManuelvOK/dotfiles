@@ -21,7 +21,8 @@ set runtimepath+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 " Plugin sources {{{2
 Plugin 'VundleVim/Vundle.vim'
-Plugin 'vim-syntastic/syntastic'
+"Plugin 'vim-syntastic/syntastic'
+Plugin 'dense-analysis/ale'
 Plugin 'tpope/vim-endwise'
 Plugin 'tpope/vim-unimpaired'
 Plugin 'justinmk/vim-syntax-extra'
@@ -37,6 +38,13 @@ Plugin 'kdrakon/AnswerSetProgramming-VIM-Syntax-Highlighting'
 Plugin 'FromtonRouge/OmniCppComplete'
 Plugin 'Vimjas/vim-python-pep8-indent'
 Plugin 'preservim/nerdtree'
+"Plugin 'preservim/vim-markdown'
+Plugin 'krisajenkins/vim-projectlocal'
+Plugin 'wsdjeg/vim-fetch'
+Plugin 'inkarkat/vim-ingo-library'
+Plugin 'inkarkat/vim-OnSyntaxChange'
+Plugin 'pangloss/vim-javascript'
+Plugin 'leafgarland/typescript-vim'
 " }}}2
 call vundle#end()
 " }}}1
@@ -60,6 +68,9 @@ set tabstop=4       " each tab is 4 spaces
 set shiftwidth=4    " use 4 spaces for each indent level
 set shiftround      " orientate indent on shiftwidth
 
+" Indentation {{{2
+set cino+=(0
+
 " Search {{{2
 set hlsearch        " always highlight search results
 set incsearch       " search incrementally
@@ -82,7 +93,7 @@ set ttymouse=sgr
 nnoremap K i<CR><Esc>
 
 " misc {{{2
-set wildignore+=*/build/*,*.d,*.o,main,*/venv/*,*/__pycache__/*,*.pdf,*.out,*.toc,*.fdb_latexmk,*.aux,*.log,*.fls ",*/doc/*   " ignore these filetypes
+set wildignore+=*/.git/*,*/build/*,*.d,*.o,main,*/venv/*,*/__pycache__/*,*/.mypy_cache/*,*.pdf,*.out,*.toc,*.fdb_latexmk,*.aux,*.log,*.fls,*/target/*,*/node_modules/* ",*/doc/*   " ignore these filetypes
 
 " Completion {{{1
 " Command line completion {{{2
@@ -94,9 +105,15 @@ set completeopt=menu,preview    " Show preview on selected entry
 autocmd CompleteDone * pclose   " close preview when completion is done
 autocmd BufNewFile,BufRead,BufEnter *.cpp,*.hpp,*.cc set omnifunc=omni#cpp#complete#Main
 "set tags+=~/.vim/tags/tags
+set tags=tags;/
 
 " Folding {{{1
+set nofoldenable
 let g:xml_syntax_folding=1      " proper xml folding
+let g:javaScript_fold=1         " enable javascript folding
+au FileType javascript setlocal foldmethod=syntax
+let g:markdown_folding=1        " enable markdown folding
+au FileType markdown setlocal foldmethod=expr
 "}}}1
 
 " Visuals {{{1
@@ -140,12 +157,14 @@ let g:ctrlp_show_hidden         = 1                     " show hidden files
 let g:ctrlp_clear_cache_on_exit = 0                     " do not clear cache at exit
 let g:ctrlp_cache_dir           = $HOME.'/.cache/ctrlp' " where to save the cache
 let g:ctrlp_root_markers        = ["tags", ".git"]      " proper pathfinding
+let g:ctrlp_max_depth           = 20
+let g:ctrlp_max_files           = 0
 let g:ctrlp_prompt_mappings     = {
             \   'PrtClearCache()':  ['<C-I>'],
             \ }                                         " reload with Ctrl-I
 
 " Pathfinder.vim {{{2
-let g:pathfinder_targets = ["tags", ".git"] " pathfinder heuristic
+let g:pathfinder_targets = ["compile_commands.json", "tags", ".git"] " pathfinder heuristic
 
 " Mzview.vim {{{2
 " goto position in pdf
@@ -167,19 +186,58 @@ nnoremap <C-K> :call ToggleNERDTree()<CR>
 " Syntastic {{{2
 let g:syntastic_c_no_default_include_dirs = 1                       " get rid of -I..
 let g:syntastic_cpp_no_default_include_dirs = 1                     " get rid of -I..
-let g:syntastic_c_include_dirs = [ 'include', 'inc', 'test/inc', 'lib']    " where to find c headers
-let g:syntastic_cpp_include_dirs = [ 'include', 'inc' , 'test/inc', 'lib'] " where to find c++ headers
-let g:syntastic_cpp_check_header = 1                                " check header files
-let g:syntastic_cpp_compiler_options = ' -std=c++2a'                " use c++17
+"let g:syntastic_c_include_dirs = [ 'include', 'inc', 'test/inc', 'lib']    " where to find c headers
+"let g:syntastic_cpp_include_dirs = [ 'include', 'inc' , 'test/inc', 'lib'] " where to find c++ headers
+"let g:syntastic_cpp_check_header = 1                                " check header files
+"let g:syntastic_cpp_compiler_options = ' -std=c++2a'                " use c++17
+
 let g:syntastic_quiet_messages = { "regex" : 'pragma once' }        " ignore pragma warnings
 let g:syntastic_always_populate_loc_list = 1
+
+let g:syntastic_cpp_checkers = ["clang_check", "clang_tidy"]
+let g:syntastic_cpp_clang_check_post_args = ""
+let g:syntastic_cpp_clang_tidy_post_args = ""
+
 let g:syntastic_lua_checkers = ["luac"]
 let g:syntastic_lua_luacheck_args = "--no-unused-args"
-let g:syntastic_python_checkers = ["pycodestyle", "mypy"]
+
+let g:syntastic_python_checkers = ["mypy", "pycodestyle"]
+let g:syntastic_javascript_checkers = ["jshint","jscs"]
+
+" Ale {{{2
+let g:ale_lint_on_text_changed = 'never'    " do not check on changed text
+let g:ale_lint_on_insert_leave = 0          " do not check when leaving insert mode
+
+let g:ale_linters_explicit = 1  "only run configured linters
+" configure linters
+let g:ale_linters = {
+\   "c"         : ["clang", "clangtidy"],
+\   "cpp"       : ["clang", "clangtidy"],
+\   "javascript": ["jshint", "jscs"],
+\   "lua"       : ["luac"],
+\   "python"    : ["mypy", "pycodestyle"],
+\   "sh"        : ["shellcheck"],
+\   "typescript": ["tsserver"],
+\}
+
+" InSyntaxChange {{{2
+
+autocmd FileType python call OnSyntaxChange#Install('Comment', '^pythonComment$', 0, 'a')
+autocmd FileType python autocmd User SyntaxCommentEnterA setlocal textwidth=72
+autocmd FileType python autocmd User SyntaxCommentLeaveA setlocal textwidth=99
 
 " OmniCppComplete {{{2
 let OmniCpp_MayCompleteDot = 0      " Do not automatically start completion on dot
 let OmniCpp_MayCompleteArrow = 0    " Do not automatically start completion on arrow
+
+" Language specific configuration {{{1
+" git commit {{{2
+au FileType gitcommit setlocal spelllang=en_us spell textwidth=68
+au FileType yaml      setlocal textwidth=80 colorcolumn=81
+au FileType markdown  setlocal spelllang=en_us spell textwidth=80 colorcolumn=81
+au FileType python    setlocal textwidth=99 colorcolumn=100
+au FileType html      setlocal shiftwidth=2 tabstop=2
+
 
 " Automations {{{1
 " OnWrite {{{2
@@ -187,4 +245,11 @@ autocmd BufWritePre * :%s/\s\+$//e  " remove trailing whitespaces
 
 " Allow projectspecific .vimrcs but safely
 set exrc
+let g:projectlocal_project_markers = ['compile_commands.json']
 set secure
+
+function! SynGroup()
+    let l:s = synID(line('.'), col('.'), 1)
+    echo synIDattr(l:s, 'name') . ' -> ' . synIDattr(synIDtrans(l:s), 'name')
+endfun
+

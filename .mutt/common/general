@@ -30,5 +30,6 @@ set pager_stop
 
 # set a default foldertype for the account
 folder-hook '.*'     'set my_foldertype=default'
+folder-hook .        'push <collapse-all>'
 
 # vim: ft=muttrc

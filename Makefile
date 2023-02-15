@@ -5,7 +5,7 @@ LINKS = $(FILES:%=~/%)
 BUNDLEDIR = .vim/bundle
 VUNDLEDIR = $(BUNDLEDIR)/Vundle.vim
 
-all: $(LINKS) vim st-install dwm-install slstatus-install
+all: $(LINKS)
 
 links: $(LINKS)
 
@@ -13,7 +13,7 @@ links: $(LINKS)
 
 # TODO: switch to ~ before executing and use vpath
 ~/.%:
-	if [ -f "$(HOME)/dotfiles/.$*" ]; then \
+	if [ -e "$(HOME)/dotfiles/.$*" ]; then \
 		ln -s ~/dotfiles/.$* $@ ; \
 	elif [ -f "$(HOME)/dotfiles/private/.$*" ]; then \
 		ln -s ~/dotfiles/private/.$* $@ ; \
