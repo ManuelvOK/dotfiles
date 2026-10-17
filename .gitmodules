@@ -7,6 +7,6 @@
 [submodule "scripts/mutt-tools"]
 	path = scripts/mutt-tools
 	url = https://github.com/manuelthieme/mutt-tools.git
-[submodule ".zsh/zsh-vi-mode"]
-	path = .zsh/zsh-vi-mode
-	url = https://github.com/jeffreytse/zsh-vi-mode
+[submodule ".zsh/zsh-vim-mode"]
+	path = .zsh/zsh-vim-mode
+	url = https://github.com/softmoth/zsh-vim-mode
