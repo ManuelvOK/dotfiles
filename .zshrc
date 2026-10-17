@@ -1,9 +1,17 @@
+###########
+# Options #
+###########
+
 autoload -Uz add-zsh-hook
 
 setopt interactivecomments
 setopt extended_glob
+setopt autocd
 
-# history
+###########
+# History #
+###########
+
 HISTFILE=~/.histfile
 HISTSIZE=10000000
 SAVEHIST=10000000
@@ -11,9 +19,10 @@ setopt hist_ignore_all_dups
 setopt hist_reduce_blanks hist_verify
 setopt share_history extended_history
 
-setopt autocd
+###########
+# Vi mode #
+###########
 
-# vi mode
 MODE_INDICATOR=            # no mode indicator in the prompt, the cursor shows it
 MODE_CURSOR_VIINS=beam
 MODE_CURSOR_REPLACE=underline
@@ -57,25 +66,44 @@ unset _key
 bindkey -M vicmd k local-vi-up-line-or-history
 bindkey -M vicmd j local-vi-down-line-or-history
 
+##############
+# Completion #
+##############
+
 autoload -Uz compinit
 compinit
 
 # Highlight selection for completion
 zstyle ':completion:*' menu select
 
+# Angular CLI completion. Generating it starts node (~0.3 s), so it is cached
+# and only regenerated when ng changes.
+_ng_comp=${XDG_CACHE_HOME:-~/.cache}/zsh/ng-completion.zsh
+if (( $+commands[ng] )); then
+  if [[ ! -s $_ng_comp || ${commands[ng]:A} -nt $_ng_comp ]]; then
+    mkdir -p ${_ng_comp:h} && ng completion script >| $_ng_comp
+  fi
+  source $_ng_comp
+fi
+unset _ng_comp
+
+########################
+# Terminal integration #
+########################
+
 # compatibility for the terminal to open selected text
 _osc7() { printf '\e]7;file://%s\a' "$PWD" }
 add-zsh-hook precmd _osc7
-
-#################
-# Custom prompt #
-#################
 
 # window title: last two directories, plus the command while one runs
 _title_dir() { print -Pn '\e]0;%2~\a' }
 _title_cmd() { print -Pn '\e]0;%2~: '; print -rn -- "$1"; print -n '\a' }
 add-zsh-hook precmd _title_dir
 add-zsh-hook preexec _title_cmd
+
+##########
+# Prompt #
+##########
 
 # git line of the prompt, sets ${_gp_line}
 source ~/.zsh/git-prompt.zsh
@@ -84,7 +112,11 @@ setopt prompt_subst
 # st: the mark (\e[ m) for Ctrl+PageUp/PageDown is part of the prompt, so it is
 # set after zle clears the line and survives prompt redraws
 PROMPT=$'%{\e[ m%}╭ %F{green}%n@%m%f [%*]: %B%F{blue}%4~%f%b ${_gp_line}\n╰ %(!.#.$) '
-RPROMPT="%0(?..%F{red}%?%f)"
+RPROMPT="%(?..%F{red}%?%f)"
+
+#######################
+# Aliases & functions #
+#######################
 
 # colors for ls and grep
 eval "$(dircolors -b)"
@@ -99,7 +131,7 @@ alias l='ls -CFv'
 alias öö='ll'
 alias ö='l'
 
-# alias for determing free space
+# alias for determining free space
 alias freespace='df -h --type=ext4'
 
 # retry last command with sudo
@@ -107,11 +139,18 @@ fuck() { sudo zsh -c "$(fc -ln -1)" }
 
 # sm with black background
 alias sm='sm --foreground=white --background=black'
-
-# yogurt
-alias yogurt='yay -Syu'
-
 alias cups='sm "631"'
+
+# packages
+alias yogurt='yay -Syu'
+autoremove() {
+  local -a orphans=(${(f)"$(pacman -Qdtq)"})
+  if (( ! $#orphans )); then
+    print "no orphaned packages"
+    return 0
+  fi
+  sudo pacman -Runs $orphans
+}
 
 # mutt aliases
 alias mutt='mutt_profile normal ifsr'
@@ -124,30 +163,21 @@ alias muttkm='mutt_profile normal kin-music'
 # points to the old home /home/morion
 alias höllidruckt='print -u2 "höllidruckt: alias is broken and needs to be fixed (see ~/.zshrc)"; lpr -P Dellifsr -o media=A4 /home/morion/IFSR/hoelli.jpg'
 
-alias autoremove='sudo pacman -Runs $(pacman -Qdtq)'
-
 alias act='source env/bin/activate'
 
 alias forget='echo RELOADAGENT | gpg-connect-agent'
 
 alias jellifin='VNC_PASSWORD=`pass jellifin/vnc` vncviewer 192.168.122.50:30 -DesktopSize=1920x1080 -securitytypes TLSVnc'
 
+###############
+# Environment #
+###############
+
 export PINENTRY_USER_DATA="curses"
 export GPG_TTY=`tty`
 # The agent's startup tty (where ssh pinentry shows up) is updated per ssh call
 # by the Match exec line in ~/.ssh/config, not here.
 
-# Angular CLI completion. Generating it starts node (~0.3 s), so it is cached
-# and only regenerated when ng changes.
-_ng_comp=${XDG_CACHE_HOME:-~/.cache}/zsh/ng-completion.zsh
-if (( $+commands[ng] )); then
-    if [[ ! -s $_ng_comp || ${commands[ng]:A} -nt $_ng_comp ]]; then
-        mkdir -p ${_ng_comp:h} && ng completion script >| $_ng_comp
-    fi
-    source $_ng_comp
-fi
-unset _ng_comp
-
 if [[ $TERM == st* ]]; then
-    export COLORTERM=truecolor
+  export COLORTERM=truecolor
 fi
