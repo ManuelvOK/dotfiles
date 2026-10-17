@@ -1,54 +1,95 @@
-# include git prompt
-source ~/.zsh/zsh-git-prompt/zshrc.sh
-
-# include vi mode
-source ~/.zsh/zsh-vi-mode/zsh-vi-mode.zsh
-ZVM_LINE_INIT_MODE=$ZVM_MODE_INSERT
+autoload -Uz add-zsh-hook
 
 setopt interactivecomments
-zstyle ':completion:*:*:git:*' script /usr/share/git/completion/git-completion.zsh
-# Lines configured by zsh-newuser-install
+setopt extended_glob
+
+# history
 HISTFILE=~/.histfile
 HISTSIZE=10000000
 SAVEHIST=10000000
 setopt hist_ignore_all_dups
+setopt hist_reduce_blanks hist_verify
+setopt share_history extended_history
+
 setopt autocd
 
-bindkey "e[3~" delete-char
+# vi mode
+MODE_INDICATOR=            # no mode indicator in the prompt, the cursor shows it
+MODE_CURSOR_VIINS=beam
+MODE_CURSOR_REPLACE=underline
+MODE_CURSOR_VICMD=block
+MODE_CURSOR_VISUAL=block
+source ~/.zsh/zsh-vim-mode/zsh-vim-mode.plugin.zsh
+KEYTIMEOUT=1               # switch to normal mode right after Esc
 
-# End of lines configured by zsh-newuser-install
-# The following lines were added by compinstall
-zstyle :compinstall filename '/home/morion/.zshrc'
+# st sends the key sequences from terminfo (e.g. ^[[3~ for Delete) only in
+# keypad application mode, so turn that on while zle reads a line. See the
+# st FAQ, "Why doesn't the Del key work in some programs?".
+if (( $+terminfo[smkx] && $+terminfo[rmkx] )); then
+  autoload -Uz add-zle-hook-widget
+  _keypad_on() { echoti smkx }
+  _keypad_off() { echoti rmkx }
+  add-zle-hook-widget line-init _keypad_on
+  add-zle-hook-widget line-finish _keypad_off
+fi
+bindkey -M vicmd '^[[3~' delete-char
+
+# share_history imports the commands of other shells. Ctrl-R searches them,
+# but Up/Down and k/j only walk the commands typed in this shell.
+_local_history() {
+  zle set-local-history 1
+  zle ${WIDGET#local-}
+  zle set-local-history 0
+}
+zle -N local-up-line-or-history _local_history
+zle -N local-down-line-or-history _local_history
+zle -N local-vi-up-line-or-history _local_history
+zle -N local-vi-down-line-or-history _local_history
+for _key in '^[[A' '^[OA'; do
+  bindkey -M viins $_key local-up-line-or-history
+  bindkey -M vicmd $_key local-up-line-or-history
+done
+for _key in '^[[B' '^[OB'; do
+  bindkey -M viins $_key local-down-line-or-history
+  bindkey -M vicmd $_key local-down-line-or-history
+done
+unset _key
+bindkey -M vicmd k local-vi-up-line-or-history
+bindkey -M vicmd j local-vi-down-line-or-history
 
 autoload -Uz compinit
 compinit
-# End of lines added by compinstall
 
 # Highlight selection for completion
 zstyle ':completion:*' menu select
 
-# Enable prompts
-autoload -Uz promptinit
-promptinit
+# compatibility for the terminal to open selected text
+_osc7() { printf '\e]7;file://%s\a' "$PWD" }
+add-zsh-hook precmd _osc7
 
-# Custom prompt
-NL=$'\n'
+#################
+# Custom prompt #
+#################
 
-PROMPT=$'╭ %B\e[00;32m%n@%m%f%b [%*]: %B\e[00;34m%4~%f%b $(git_super_status)${NL}╰ %(!.#.$) '
+# window title: last two directories, plus the command while one runs
+_title_dir() { print -Pn '\e]0;%2~\a' }
+_title_cmd() { print -Pn '\e]0;%2~: '; print -rn -- "$1"; print -n '\a' }
+add-zsh-hook precmd _title_dir
+add-zsh-hook preexec _title_cmd
+
+# git line of the prompt, sets ${_gp_line}
+source ~/.zsh/git-prompt.zsh
+setopt prompt_subst
+
+# st: the mark (\e[ m) for Ctrl+PageUp/PageDown is part of the prompt, so it is
+# set after zle clears the line and survives prompt redraws
+PROMPT=$'%{\e[ m%}╭ %F{green}%n@%m%f [%*]: %B%F{blue}%4~%f%b ${_gp_line}\n╰ %(!.#.$) '
 RPROMPT="%0(?..%F{red}%?%f)"
 
-
-# enable color support of ls and also add handy aliases
-if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    alias ls='ls --color=auto'
-    #alias dir='dir --color=auto'
-    #alias vdir='vdir --color=auto'
-
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
-fi
+# colors for ls and grep
+eval "$(dircolors -b)"
+alias ls='ls --color=auto'
+alias grep='grep --color=auto'
 
 # some more ls aliases
 alias ll='ls -AlFhv'
@@ -58,51 +99,17 @@ alias l='ls -CFv'
 alias öö='ll'
 alias ö='l'
 
-# plex
-alias plex-connect='ssh ssh-login-u42@5.9.86.144 -p 44938 -i .ssh/guro'
-
 # alias for determing free space
 alias freespace='df -h --type=ext4'
 
 # retry last command with sudo
-alias fuck='sudo $(fc -ln -1)'
-#alias fuck='sudo $(history -p \!\!)'
+fuck() { sudo zsh -c "$(fc -ln -1)" }
 
 # sm with black background
 alias sm='sm --foreground=white --background=black'
 
-# beamer at E069
-alias apb-e069='xrandr --output VGA1 --mode 1400x1050 --right-of LVDS1'
-
-# beamer at E067
-alias apb-e067='xrandr --output VGA1 --mode 1280x1024 --right-of LVDS1'
-
-alias homeoffice='xrandr --output DisplayPort-2 --mode 2560x1440 --pos 0x0 --primary --output eDP --pos 320x1440'
-
 # yogurt
 alias yogurt='yay -Syu'
-
-# start samba sevices
-alias startsamba='sudo systemctl start smbd && sudo systemctl start nmbd'
-
-# steam sucks...
-alias steam='LD_PRELOAD="/usr/$LIB/libstdc++.so.6 /usr/$LIB/libgcc_s.so.1 /usr/$LIB/libxcb.so.1 /usr/$LIB/libgpg-error.so" steam'
-
-alias repair_steam='find ~/.steam/root/ \( -name "libgcc_s.so*" -o -name "libstdc++.so*" -o -name "libxcb.so*" -o -name "libgpg-error.so*" \) -print -delete'
-
-# print fingerprint information to screen
-alias fingerprint='sm "Manuel Thieme
-
-
-info@manuel-thieme.de
-manuel@ifsr.de
-s0020628@mail.zih.tu-dresden.de
-manuelthieme@googlemail.com
-manuel.thieme@tu-dresden.de
-
-
-9128 7DD1 C1CE FB91 3F2B 55D0 4225 2CDA 7AF6 F930
-"'
 
 alias cups='sm "631"'
 
@@ -113,7 +120,9 @@ alias muttm='mutt_profile normal manuel-kalettka'
 alias muttk='mutt_profile normal kernkonzept'
 alias muttkm='mutt_profile normal kin-music'
 
-alias höllidruckt='lpr -P Dellifsr -o media=A4 /home/morion/IFSR/hoelli.jpg'
+# FIXME: printer Dellifsr is not configured in CUPS anymore and the path
+# points to the old home /home/morion
+alias höllidruckt='print -u2 "höllidruckt: alias is broken and needs to be fixed (see ~/.zshrc)"; lpr -P Dellifsr -o media=A4 /home/morion/IFSR/hoelli.jpg'
 
 alias autoremove='sudo pacman -Runs $(pacman -Qdtq)'
 
@@ -121,19 +130,24 @@ alias act='source env/bin/activate'
 
 alias forget='echo RELOADAGENT | gpg-connect-agent'
 
-if [ -f ~/.bash_aliases ]; then
-    . ~/.bash_aliases
-fi
+alias jellifin='VNC_PASSWORD=`pass jellifin/vnc` vncviewer 192.168.122.50:30 -DesktopSize=1920x1080 -securitytypes TLSVnc'
 
 export PINENTRY_USER_DATA="curses"
-typeset -U PATH path
-path=($path ~/.gem/ruby/2.2.0/bin)
-path=($path ~/dotfiles/scripts)
-path=($path ~/dotfiles/scripts/mutt-tools)
-path=($path ~/.local/bin)
-
 export GPG_TTY=`tty`
-gpg-connect-agent updatestartuptty /bye >/dev/null
+# The agent's startup tty (where ssh pinentry shows up) is updated per ssh call
+# by the Match exec line in ~/.ssh/config, not here.
 
-export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
+# Angular CLI completion. Generating it starts node (~0.3 s), so it is cached
+# and only regenerated when ng changes.
+_ng_comp=${XDG_CACHE_HOME:-~/.cache}/zsh/ng-completion.zsh
+if (( $+commands[ng] )); then
+    if [[ ! -s $_ng_comp || ${commands[ng]:A} -nt $_ng_comp ]]; then
+        mkdir -p ${_ng_comp:h} && ng completion script >| $_ng_comp
+    fi
+    source $_ng_comp
+fi
+unset _ng_comp
 
+if [[ $TERM == st* ]]; then
+    export COLORTERM=truecolor
+fi
