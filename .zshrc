@@ -2,11 +2,23 @@
 # Options #
 ###########
 
-autoload -Uz add-zsh-hook
+autoload -Uz add-zsh-hook add-zle-hook-widget
 
 setopt interactivecomments
 setopt extended_glob
 setopt autocd
+
+# directory stack: cd -<Tab> lists recent directories, cd -N jumps back
+setopt auto_pushd pushd_ignore_dups pushd_silent
+DIRSTACKSIZE=20
+
+# print timing statistics of commands that use more than 10 s of CPU time
+# (user + system, so waiting commands like sleep or ssh never show up)
+REPORTTIME=10
+
+# no terminal flow control: Ctrl-S no longer freezes the terminal, and
+# programs like vim get Ctrl-S and Ctrl-Q as normal keys
+[[ -t 0 ]] && stty -ixon
 
 ###########
 # History #
@@ -35,7 +47,6 @@ KEYTIMEOUT=1               # switch to normal mode right after Esc
 # keypad application mode, so turn that on while zle reads a line. See the
 # st FAQ, "Why doesn't the Del key work in some programs?".
 if (( $+terminfo[smkx] && $+terminfo[rmkx] )); then
-  autoload -Uz add-zle-hook-widget
   _keypad_on() { echoti smkx }
   _keypad_off() { echoti rmkx }
   add-zle-hook-widget line-init _keypad_on
@@ -76,6 +87,26 @@ compinit
 # Highlight selection for completion
 zstyle ':completion:*' menu select
 
+# offer newly installed commands without starting a new shell
+zstyle ':completion:*' rehash true
+
+# cache slow completions (systemctl units, python/perl modules, modprobe, ...)
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path ${XDG_CACHE_HOME:-~/.cache}/zsh/zcompcache
+
+# LS_COLORS, used by ls and the completion list
+eval "$(dircolors -b)"
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+
+# lowercase also matches uppercase ("doc" completes "Documents"), but
+# uppercase only matches itself
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+
+# group matches under headings like "-- file --"
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*:descriptions' format '%F{yellow}-- %d --%f'
+zstyle ':completion:*:warnings' format '%F{red}-- no matches --%f'
+
 # Angular CLI completion. Generating it starts node (~0.3 s), so it is cached
 # and only regenerated when ng changes.
 _ng_comp=${XDG_CACHE_HOME:-~/.cache}/zsh/ng-completion.zsh
@@ -86,6 +117,46 @@ if (( $+commands[ng] )); then
   source $_ng_comp
 fi
 unset _ng_comp
+
+###########################
+# fzf and autosuggestions #
+###########################
+
+# fzf: Ctrl-R searches the history (of all shells), Ctrl-T inserts file paths,
+# Alt-C cds into a directory, **<Tab> fuzzy completion. Loaded after the vi
+# mode plugin, which binds Ctrl-R as well.
+# Ctrl-R lists the newest matches first instead of the best ones. Inside it,
+# Ctrl-R toggles to best match first.
+FZF_CTRL_R_OPTS='--no-sort'
+if [[ -r /usr/share/fzf/key-bindings.zsh ]]; then
+  source /usr/share/fzf/key-bindings.zsh
+  source /usr/share/fzf/completion.zsh
+fi
+
+# zsh-autosuggestions: grey suggestion from history. Shift-Tab, Right or End
+# (l in normal mode) accept it, Ctrl-Tab accepts the next word.
+if [[ -r /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
+  # all widgets exist before the first prompt, so binding them once is enough
+  ZSH_AUTOSUGGEST_MANUAL_REBIND=1
+  # medium grey, readable on the dark background (colour 8 is almost black)
+  ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=244'
+  source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+  # these replace the whole line, so they drop the suggestion like the
+  # built-in history widgets do
+  ZSH_AUTOSUGGEST_CLEAR_WIDGETS+=(
+    local-up-line-or-history local-down-line-or-history
+    local-vi-up-line-or-history local-vi-down-line-or-history
+    vi-up-line-or-history vi-down-line-or-history
+    fzf-history-widget
+  )
+  # forward-word accepts the suggestion up to the end of the next word. st
+  # sends Ctrl-Tab as CSI 9;5 u (see its config.h), plain Tab otherwise.
+  bindkey -M viins '^[[Z' autosuggest-accept
+  bindkey -M viins '^[[9;5u' forward-word
+  # Shift-Tab used to step back in the completion menu. Keep that there.
+  zmodload zsh/complist
+  bindkey -M menuselect '^[[Z' reverse-menu-complete
+fi
 
 ########################
 # Terminal integration #
@@ -114,12 +185,28 @@ setopt prompt_subst
 PROMPT=$'%{\e[ m%}╭ %F{green}%n@%m%f [%*]: %B%F{blue}%4~%f%b ${_gp_line}\n╰ %(!.#.$) '
 RPROMPT="%(?..%F{red}%?%f)"
 
+# Transient prompt: once a line is accepted, its prompt in the scrollback
+# shrinks to one line with the start time, directory and git status. The st
+# mark stays, so Ctrl+PageUp/PageDown still jump between commands.
+# ${_gp_short} is referenced, not inserted, so a branch name is never
+# evaluated as prompt code.
+TRANSIENT_PROMPT=$'%{\e[ m%}%F{244}[%*]%f %B%F{blue}%4~%f%b ${_gp_short:+$_gp_short }%(!.#.$) '
+_full_prompt=$PROMPT _full_rprompt=$RPROMPT
+_transient_prompt() {
+  # the git line without its line break and frame, e.g. "(master|✔)"
+  typeset -g _gp_short=${_gp_line#$'\n│'}
+  PROMPT=$TRANSIENT_PROMPT RPROMPT=
+  zle .reset-prompt
+}
+_restore_prompt() { PROMPT=$_full_prompt RPROMPT=$_full_rprompt }
+add-zle-hook-widget line-finish _transient_prompt
+add-zsh-hook precmd _restore_prompt
+
 #######################
 # Aliases & functions #
 #######################
 
 # colors for ls and grep
-eval "$(dircolors -b)"
 alias ls='ls --color=auto'
 alias grep='grep --color=auto'
 
@@ -133,6 +220,14 @@ alias ö='l'
 
 # alias for determining free space
 alias freespace='df -h --type=ext4'
+
+# typing a file name as the command opens it with the default application,
+# e.g. "paper.pdf" runs "xdg-open paper.pdf". Suffix aliases are case-sensitive,
+# so each extension is registered in lower and upper case (cameras write .JPG).
+for _ext in pdf png jpg jpeg gif webp svg mp4 mkv webm mp3 flac odt ods docx xlsx; do
+  alias -s $_ext=xdg-open ${(U)_ext}=xdg-open
+done
+unset _ext
 
 # retry last command with sudo
 fuck() { sudo zsh -c "$(fc -ln -1)" }
@@ -180,4 +275,14 @@ export GPG_TTY=`tty`
 
 if [[ $TERM == st* ]]; then
   export COLORTERM=truecolor
+fi
+
+#######################
+# Syntax highlighting #
+#######################
+
+# Must be sourced last: it hooks into zle after everything else that changes
+# the command line (see its README).
+if [[ -r /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
+  source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 fi
