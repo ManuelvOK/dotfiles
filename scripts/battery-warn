@@ -1,0 +1,106 @@
+#!/bin/sh
+# Battery notifications, run by battery-warn.service in the X session:
+# - docked, but not charging (the dock runs the monitors, but fails to power
+#   the laptop)
+# - on battery, plugged in but discharging, charging again
+# - low at 20 %, critical at 10 % and every further 2 %
+# It only notifies about changes. All notifications replace each other.
+
+# USB IDs (vendor:product) of docks. Any of them present counts as docked.
+DOCKS="17ef:10c9"               # Lenovo USB-C dock (its Billboard device)
+LOW=20
+CRITICAL=10
+INTERVAL=${BATTERY_WARN_INTERVAL:-30}
+
+# overridable for testing
+PS=${BATTERY_WARN_POWER_SUPPLY:-/sys/class/power_supply}
+USB=${BATTERY_WARN_USB_DEVICES:-/sys/bus/usb/devices}
+NOTIFY=${BATTERY_WARN_NOTIFY:-notify-send}
+
+notify() { # urgency summary [body]
+	$NOTIFY -u "$1" -a battery -h string:x-dunst-stack-tag:battery "$2" "${3:-}"
+}
+
+# 1 if any non-battery power supply (mains, USB-C) is online
+on_ac() {
+	for s in "$PS"/*; do
+		[ "$(cat "$s/type" 2>/dev/null)" = Battery ] && continue
+		[ "$(cat "$s/online" 2>/dev/null)" = 1 ] && { echo 1; return; }
+	done
+	echo 0
+}
+
+docked() {
+	for d in "$USB"/*; do
+		[ -r "$d/idVendor" ] || continue
+		case " $DOCKS " in
+			*" $(cat "$d/idVendor"):$(cat "$d/idProduct") "*) echo 1; return ;;
+		esac
+	done
+	echo 0
+}
+
+# remaining time while discharging, e.g. "about 50 min left"
+time_left() {
+	e=$(cat "$bat/energy_now" 2>/dev/null) p=$(cat "$bat/power_now" 2>/dev/null)
+	[ -n "$e" ] && [ "${p:-0}" -gt 0 ] && echo "about $((e * 60 / p)) min left"
+}
+
+bat=
+for b in "$PS"/BAT*; do
+	[ -r "$b/capacity" ] && { bat=$b; break; }
+done
+[ -n "$bat" ] || exit 0         # no battery, nothing to warn about
+
+prev=                           # last power situation, see below
+low_done=0                      # low warning shown in this discharge
+crit_at=                        # capacity of the last critical warning
+
+while :; do
+	ac=$(on_ac) dock=$(docked)
+	cap=$(cat "$bat/capacity") status=$(cat "$bat/status")
+
+	# power situation: charging, ok (plugged in, full or held at a
+	# threshold), dock (docked, no power), drain (plugged in, discharging),
+	# battery (not plugged in)
+	if [ "$ac" = 1 ]; then
+		case $status in
+			Discharging) now=drain ;;
+			Charging) now=charging ;;
+			*) now=ok ;;
+		esac
+	elif [ "$dock" = 1 ]; then
+		now=dock
+	else
+		now=battery
+	fi
+
+	if [ "$now" != "$prev" ]; then
+		case $now in
+			dock) notify critical "Docked, but not charging ($cap %)" \
+				"The dock runs the monitors, but does not power the laptop. Replug the USB-C cable." ;;
+			drain) notify critical "Plugged in, but discharging ($cap %)" \
+				"The power supply or dock delivers less than the laptop uses." ;;
+			battery) notify normal "On battery ($cap %)" "$(time_left)" ;;
+			charging) [ -n "$prev" ] && notify low "Charging ($cap %)" ;;
+		esac
+		prev=$now
+	fi
+
+	if [ "$status" = Discharging ]; then
+		if [ "$cap" -le "$CRITICAL" ]; then
+			if [ -z "$crit_at" ] || [ "$cap" -le $((crit_at - 2)) ]; then
+				notify critical "Battery critical: $cap %" \
+					"Plug in or save your work. $(time_left)"
+				crit_at=$cap
+			fi
+		elif [ "$cap" -le "$LOW" ] && [ "$low_done" = 0 ]; then
+			notify normal "Battery low: $cap %" "$(time_left)"
+			low_done=1
+		fi
+	else
+		low_done=0 crit_at=
+	fi
+
+	sleep "$INTERVAL"
+done

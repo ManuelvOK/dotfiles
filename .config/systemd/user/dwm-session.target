@@ -1,0 +1,8 @@
+# Started and stopped by ~/.xinitrc. Binds graphical-session.target, so
+# units that are PartOf it run exactly as long as the X session.
+[Unit]
+Description=dwm X session
+BindsTo=graphical-session.target
+Wants=graphical-session-pre.target
+After=graphical-session-pre.target
+Wants=redshift.service battery-warn.service

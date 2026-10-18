@@ -1,0 +1,9 @@
+# Battery notifications for the X session, pulled in by dwm-session.target
+[Unit]
+Description=Battery notifications
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+ExecStart=%h/dotfiles/scripts/battery-warn
+Restart=on-failure
