@@ -4,6 +4,16 @@ text/html;                  w3m -I %{charset} -T text/html; copiousoutput;
 #text/html;                  mutt_view firefox %s; nametemplate=%s.html; test=runningx
 #text/html;                  elinks %s; nametemplate=%s.html
 
+# Diffs
+text/x-diff;                cat %s | colordiff; copiousoutput;
+text/x-patch;               cat %s | colordiff; copiousoutput;
+
+# Calendar Events
+text/calendar;              icsviewer %s; copiousoutput;
+
+# other text files
+text/*;                     iconv -f latin1 %s; copiousoutput;
+
 # MS Office files
 application/word;           mutt_view libreoffice %s;
 application/msword;         mutt_view libreoffice %s;
@@ -22,13 +32,6 @@ application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; mutt_view lib
 
 # PDF files
 application/pdf;            mutt_view zathura %s;
-
-# Diffs
-text/x-diff;                cat %s | colordiff; copiousoutput
-text/x-patch;               cat %s | colordiff; copiousoutput
-
-# Calendar Events
-text/calendar;              icsviewer %s; copiousoutput
 
 # Pictures
 image/*;                    mutt_view sxiv %s;

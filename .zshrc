@@ -130,5 +130,10 @@ typeset -U PATH path
 path=($path ~/.gem/ruby/2.2.0/bin)
 path=($path ~/dotfiles/scripts)
 path=($path ~/dotfiles/scripts/mutt-tools)
+path=($path ~/.local/bin)
+
 export GPG_TTY=`tty`
 gpg-connect-agent updatestartuptty /bye >/dev/null
+
+export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
+

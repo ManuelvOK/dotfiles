@@ -1,0 +1,3 @@
+#! /usr/bin/env bash
+
+rg "$@" | tee /dev/fd/2 | sed -E "s/(.*:[[:digit:]]+:).*/\1/g" | xargs -o vim

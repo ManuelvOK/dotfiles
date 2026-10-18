@@ -11,10 +11,21 @@ if [[ $1 == "--start" ]] ;then
     "${cmd[@]}"
 fi
 
+OUTPUT1_MODE=1920x1080
+OUTPUT0_POS=0x1080
+OUTPUT2_POS=3175x0
+xrandr --dryrun --output "${connected_devices[1]}" --mode 2560x1440 >/dev/null 2>&1
+if [[ $? -ne 1 ]] ;then
+    echo "output 1 is big"
+    OUTPUT1_MODE=2560x1440
+    OUTPUT0_POS=0x1440
+    OUTPUT2_POS=3815x0
+fi
+
 cmd=(xrandr
-     --output "${connected_devices[0]}" --mode 1920x1080 --pos 0x1080 --rotate normal
-     --output "${connected_devices[1]}" --primary --mode 1920x1080 --pos 1255x0 --rotate normal
-     --output "${connected_devices[2]}" --mode 1920x1080 --pos 3175x0 --rotate normal
+     --output "${connected_devices[0]}" --mode 1920x1080 --pos "$OUTPUT0_POS" --rotate normal
+     --output "${connected_devices[1]}" --primary --mode "$OUTPUT1_MODE" --pos 1255x0 --rotate normal
+     --output "${connected_devices[2]}" --mode 1920x1080 --pos "$OUTPUT2_POS" --rotate normal
 )
 
 readarray -td$'\n' disconnected_devices <<<"$(xrandr | grep " disconnected " | awk '{ print $1 }')"
@@ -23,7 +34,3 @@ for device in "${disconnected_devices[@]}"; do
 done
 
 "${cmd[@]}"
-
-xset r rate 300 55
-setxkbmap -option 'ctrl:nocaps'
-a=52;b=29;c=xmodmap;d="$c -e '";$c -pke | sed -nr "s/^(keycode *)$b(.*)/$d\1$a\2'/p;t;s/^(keycode *)$a(.*)/$d\1$b\2'/p" | sh

@@ -11,7 +11,6 @@
 "                         \__,_|\__, |\__,_|_|_| |_(_)
 "                               |___/
 
-
 set nocompatible
 
 " Plugin management (I use Vundle) {{{1
@@ -21,30 +20,43 @@ set runtimepath+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 " Plugin sources {{{2
 Plugin 'VundleVim/Vundle.vim'
-"Plugin 'vim-syntastic/syntastic'
-Plugin 'dense-analysis/ale'
-Plugin 'tpope/vim-endwise'
-Plugin 'tpope/vim-unimpaired'
-Plugin 'justinmk/vim-syntax-extra'
-Plugin 'pboettch/vim-highlight-cursor-words'
-Plugin 'lodifice/omnitags.vim'
-Plugin 'lodifice/pathfinder.vim'
-Plugin 'lodifice/guillotine.vim'
-Plugin 'lodifice/panzer.vim'
-Plugin 'lodifice/mzview.vim'
-Plugin 'lodifice/wombat256.vim'
-Plugin 'kien/ctrlp.vim'
-Plugin 'kdrakon/AnswerSetProgramming-VIM-Syntax-Highlighting'
+
 Plugin 'FromtonRouge/OmniCppComplete'
 Plugin 'Vimjas/vim-python-pep8-indent'
-Plugin 'preservim/nerdtree'
-"Plugin 'preservim/vim-markdown'
-Plugin 'krisajenkins/vim-projectlocal'
-Plugin 'wsdjeg/vim-fetch'
-Plugin 'inkarkat/vim-ingo-library'
+"Plugin 'davidhalter/jedi-vim'
+Plugin 'dense-analysis/ale'
 Plugin 'inkarkat/vim-OnSyntaxChange'
+Plugin 'inkarkat/vim-ingo-library'
+Plugin 'junegunn/vim-peekaboo'
+Plugin 'justinmk/vim-syntax-extra'
+Plugin 'kdrakon/AnswerSetProgramming-VIM-Syntax-Highlighting'
+Plugin 'kien/ctrlp.vim'
+Plugin 'Konfekt/FastFold'
+Plugin 'krisajenkins/vim-projectlocal'
+Plugin 'lodifice/guillotine.vim'
+Plugin 'lodifice/mzview.vim'
+Plugin 'lodifice/omnitags.vim'
+Plugin 'lodifice/panzer.vim'
+Plugin 'lodifice/pathfinder.vim'
+Plugin 'lodifice/wombat256.vim'
+Plugin 'machakann/vim-highlightedyank'
 Plugin 'pangloss/vim-javascript'
-Plugin 'leafgarland/typescript-vim'
+Plugin 'pboettch/vim-highlight-cursor-words'
+Plugin 'preservim/nerdtree'
+Plugin 'tmhedberg/SimpylFold'
+Plugin 'tommcdo/vim-exchange'
+Plugin 'tpope/vim-abolish'
+Plugin 'tpope/vim-commentary'
+Plugin 'tpope/vim-endwise'
+Plugin 'tpope/vim-repeat'
+Plugin 'tpope/vim-speeddating'
+Plugin 'tpope/vim-surround'
+Plugin 'tpope/vim-unimpaired'
+Plugin 'vim-python/python-syntax'
+Plugin 'wellle/targets.vim'
+Plugin 'wsdjeg/vim-fetch'
+Plugin 'Xuyuanp/nerdtree-git-plugin'
+Plugin 'zivyangll/git-blame.vim'
 " }}}2
 call vundle#end()
 " }}}1
@@ -93,7 +105,10 @@ set ttymouse=sgr
 nnoremap K i<CR><Esc>
 
 " misc {{{2
-set wildignore+=*/.git/*,*/build/*,*.d,*.o,main,*/venv/*,*/__pycache__/*,*/.mypy_cache/*,*.pdf,*.out,*.toc,*.fdb_latexmk,*.aux,*.log,*.fls,*/target/*,*/node_modules/* ",*/doc/*   " ignore these filetypes
+set wildignore+=*/.git/*,*/build/*,*.d,*.o,main,*/venv/*,*/__pycache__/*,*/.mypy_cache/*,*.pdf,*.out,*.toc,*.fdb_latexmk,*.aux,*.log,*.fls,*/target/*,*/node_modules/*,*/angular_devtools/* ",*/doc/*   " ignore these filetypes
+" Turn off Ex mode
+map Q <Nop>
+map q: <Nop>
 
 " Completion {{{1
 " Command line completion {{{2
@@ -114,6 +129,7 @@ let g:javaScript_fold=1         " enable javascript folding
 au FileType javascript setlocal foldmethod=syntax
 let g:markdown_folding=1        " enable markdown folding
 au FileType markdown setlocal foldmethod=expr
+au FileType python setlocal foldmethod=indent
 "}}}1
 
 " Visuals {{{1
@@ -180,33 +196,21 @@ function! ToggleNERDTree()
         NERDTreeFind
     endif
 endfunction
+let g:NERDTreeHijackNetrw = 1
+let g:NERDTreeGitStatusUseNerdFonts = 1
+let g:NERDTreeQuitOnOpen = 1
 
 nnoremap <C-K> :call ToggleNERDTree()<CR>
 
-" Syntastic {{{2
-let g:syntastic_c_no_default_include_dirs = 1                       " get rid of -I..
-let g:syntastic_cpp_no_default_include_dirs = 1                     " get rid of -I..
-"let g:syntastic_c_include_dirs = [ 'include', 'inc', 'test/inc', 'lib']    " where to find c headers
-"let g:syntastic_cpp_include_dirs = [ 'include', 'inc' , 'test/inc', 'lib'] " where to find c++ headers
-"let g:syntastic_cpp_check_header = 1                                " check header files
-"let g:syntastic_cpp_compiler_options = ' -std=c++2a'                " use c++17
-
-let g:syntastic_quiet_messages = { "regex" : 'pragma once' }        " ignore pragma warnings
-let g:syntastic_always_populate_loc_list = 1
-
-let g:syntastic_cpp_checkers = ["clang_check", "clang_tidy"]
-let g:syntastic_cpp_clang_check_post_args = ""
-let g:syntastic_cpp_clang_tidy_post_args = ""
-
-let g:syntastic_lua_checkers = ["luac"]
-let g:syntastic_lua_luacheck_args = "--no-unused-args"
-
-let g:syntastic_python_checkers = ["mypy", "pycodestyle"]
-let g:syntastic_javascript_checkers = ["jshint","jscs"]
-
 " Ale {{{2
-let g:ale_lint_on_text_changed = 'never'    " do not check on changed text
+let g:ale_lint_on_text_changed = 0          " do not check on changed text
 let g:ale_lint_on_insert_leave = 0          " do not check when leaving insert mode
+let g:ale_lint_on_filetype_changed = 0
+let g:ale_lint_on_enter = 0
+let g:ale_hover_cursor = 0                  " do not print info about hovered
+autocmd filetype python set omnifunc=ale#completion#OmniFunc
+" use Language server for following definitions
+autocmd filetype python nmap gd :ALEGoToDefinition<CR>
 
 let g:ale_linters_explicit = 1  "only run configured linters
 " configure linters
@@ -215,33 +219,54 @@ let g:ale_linters = {
 \   "cpp"       : ["clang", "clangtidy"],
 \   "javascript": ["jshint", "jscs"],
 \   "lua"       : ["luac"],
-\   "python"    : ["mypy", "pycodestyle"],
+\   "python"    : ["jedils", "mypy", "flake8", "pycodestyle"],
 \   "sh"        : ["shellcheck"],
 \   "typescript": ["tsserver"],
+\   "html"      : ["angular"],
 \}
+
+" Flake8 global config file
+let g:ale_python_flake8_options = '--append-config ~/.flake8'
+
+" go to references
+nmap gr :ALEFindReferences<CR>
 
 " InSyntaxChange {{{2
 
 autocmd FileType python call OnSyntaxChange#Install('Comment', '^pythonComment$', 0, 'a')
 autocmd FileType python autocmd User SyntaxCommentEnterA setlocal textwidth=72
 autocmd FileType python autocmd User SyntaxCommentLeaveA setlocal textwidth=99
+let g:python_highlight_all = 1
 
 " OmniCppComplete {{{2
 let OmniCpp_MayCompleteDot = 0      " Do not automatically start completion on dot
 let OmniCpp_MayCompleteArrow = 0    " Do not automatically start completion on arrow
 
+" Jedi-vim {{{2
+"let g:jedi#show_call_signatures = 0
+"let g:jedi#auto_vim_configuration = 0
+"let g:jedi#popup_on_dot = 0
+"" I don't need the documentation for the word under the cursor, and <K> is
+"" already mapped.
+"let g:jedi#documentation_command = ''
+
+
 " Language specific configuration {{{1
 " git commit {{{2
-au FileType gitcommit setlocal spelllang=en_us spell textwidth=68
-au FileType yaml      setlocal textwidth=80 colorcolumn=81
-au FileType markdown  setlocal spelllang=en_us spell textwidth=80 colorcolumn=81
-au FileType python    setlocal textwidth=99 colorcolumn=100
-au FileType html      setlocal shiftwidth=2 tabstop=2
+au FileType gitcommit   setlocal spelllang=en_us spell textwidth=72
+au FileType yaml        setlocal textwidth=80 colorcolumn=81 foldmethod=indent foldlevel=99
+au FileType markdown    setlocal spelllang=en_us spell textwidth=80 colorcolumn=81
+au FileType python      setlocal textwidth=99 colorcolumn=100
+au FileType html        setlocal shiftwidth=2 tabstop=2
+au FileType htmlangular setlocal ft=html
+au FileType make        setlocal iskeyword+=- tabstop=8
+au FileType typescript  setlocal textwidth=99 colorcolumn=100
 
+nnoremap gb :<C-u>call gitblame#echo()<CR>
 
 " Automations {{{1
 " OnWrite {{{2
-autocmd BufWritePre * :%s/\s\+$//e  " remove trailing whitespaces
+" autocmd BufWritePre * :%s/\s\+$//e  " remove trailing whitespaces
 
 " Allow projectspecific .vimrcs but safely
 set exrc

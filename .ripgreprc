@@ -1,0 +1,18 @@
+# don't ignore files in .gitignore
+--no-ignore
+
+# don't ignore hidden files
+--hidden
+
+# exclude .git directories
+--glob=!.git/
+--glob=!.mypy_cache/
+
+# use case rules like in vim
+--smart-case
+
+# show line number by default
+--line-number
+
+# output grep like
+--no-heading

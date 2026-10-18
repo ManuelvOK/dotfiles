@@ -1,19 +1,50 @@
 [user]
-	email = info@manuel-thieme.de
-	name = manuelvok
+    name = Manuel Kalettka
+    email = manuel.kalettka@kernkonzept.com
+[advice]
+    detachedHead = false
+    skippedCherryPicks = false
 [alias]
-    co = checkout
     br = branch
     ci = commit
+    cia = commit --amend
+    cian = commit --amend --no-edit
+    co = checkout
+    cp = cherry-pick
+    cpc = cherry-pick --continue
+    cpa = cherry-pick --abort
+    d  = diff
+    ll = log --oneline
+    ol = "log --all --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
+    r  = reset HEAD~
+    rh = reset --hard HEAD~
+    rb = rebase
+    rbi = rebase --interactive
+    rba = rebase --abort
+    rbc = rebase --continue
+    rbe = rebase --edit-todo
     st = status
+    wd = diff --color-words
+[branch]
+    autoSetupRebase = always
+    sort = committerdate
+[column]
+    ui = always column
+[core]
+    editor = vim
+    excludesFile = ~/dotfiles/.gitignore_global
 [diff]
     tool = vimdiff
 [merge]
     tool = vimdiff
 [push]
     default = tracking
-[core]
-    editor = vim
-    excludesFile = ~/dotfiles/.gitignore_global
-[advice]
-    detachedHead = false
+[rebase]
+    autoStash = true
+[rerere]
+    enabled = true
+[status]
+    short = true
+    branch = true
+[color]
+    ui = auto
