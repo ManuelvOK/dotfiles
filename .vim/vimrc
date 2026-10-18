@@ -23,7 +23,6 @@ Plugin 'VundleVim/Vundle.vim'
 
 Plugin 'FromtonRouge/OmniCppComplete'
 Plugin 'Vimjas/vim-python-pep8-indent'
-"Plugin 'davidhalter/jedi-vim'
 Plugin 'dense-analysis/ale'
 Plugin 'inkarkat/vim-OnSyntaxChange'
 Plugin 'inkarkat/vim-ingo-library'
@@ -129,7 +128,6 @@ let g:javaScript_fold=1         " enable javascript folding
 au FileType javascript setlocal foldmethod=syntax
 let g:markdown_folding=1        " enable markdown folding
 au FileType markdown setlocal foldmethod=expr
-au FileType python setlocal foldmethod=indent
 "}}}1
 
 " Visuals {{{1
@@ -157,14 +155,50 @@ highlight Search ctermbg=none
 highlight Comment ctermfg=241
 highligh ColorColumn ctermbg=233
 
+" undercurl (wavy line) and its color in st
+let &t_Cs = "\e[4:3m"
+let &t_Ce = "\e[4:0m"
+let &t_AU = "\e[58:5:%dm"
+hi SpellBad   cterm=undercurl ctermbg=NONE ctermul=red      " unknown word
+hi SpellLocal cterm=undercurl ctermbg=NONE ctermul=cyan     " word of another region (US/GB)
+hi SpellCap   cterm=undercurl ctermbg=NONE ctermul=blue     " lowercase sentence start
+hi SpellRare  cterm=undercurl ctermbg=NONE ctermul=magenta  " rare word
+
+" Spelling {{{2
+" British English by default. zg adds a word to the list of the first
+" language in spelllang, 2zg to the other list. en_gb and en_us share en.
+" zg does not expand ~ in spellfile, so the paths have to be expanded here
+let s:spell_en = expand('~/.vim/spell/en.utf-8.add')
+let s:spell_de = expand('~/.vim/spell/de.utf-8.add')
+set spelllang=en_gb
+let &spellfile = s:spell_en . ',' . s:spell_de
+
+function! s:SetSpellLang(lang) abort
+    let &l:spelllang = a:lang
+    let &l:spellfile = a:lang =~# '^de'
+                \ ? s:spell_de . ',' . s:spell_en
+                \ : s:spell_en . ',' . s:spell_de
+endfunction
+
+" cycle en_gb -> en_us -> de,en_gb and switch spell checking on
+function! s:CycleSpellLang() abort
+    let l:langs = ['en_gb', 'en_us', 'de,en_gb']
+    let l:next = l:langs[(index(l:langs, &l:spelllang) + 1) % len(l:langs)]
+    call s:SetSpellLang(l:next)
+    setlocal spell
+    echo 'spelllang=' . &l:spelllang
+endfunction
+nnoremap <silent> <F7> :call <SID>CycleSpellLang()<CR>
+
 " Font {{{2
 set guifont="Fantasque Sans Mono 12"
 
 " Plugin configuration {{{1
 " Guillotine.vim {{{2
+" ga switches between header and source, only in C and C++ buffers
 augroup guillotine
     autocmd!
-    autocmd BufEnter * if exists(":ToggleHeaderSource") | execute "nmap <buffer> ga :ToggleHeaderSource<cr>" | endif
+    autocmd FileType c,cpp nnoremap <buffer> ga :ToggleHeaderSource<CR>
 augroup END
 
 " CtrlP {{{2
@@ -175,9 +209,12 @@ let g:ctrlp_cache_dir           = $HOME.'/.cache/ctrlp' " where to save the cach
 let g:ctrlp_root_markers        = ["tags", ".git"]      " proper pathfinding
 let g:ctrlp_max_depth           = 20
 let g:ctrlp_max_files           = 0
+" Ctrl-I rescans, right after Ctrl-P. In a terminal Ctrl-I is the same key as
+" Tab, which CtrlP uses to complete directory names, so that is switched off.
 let g:ctrlp_prompt_mappings     = {
             \   'PrtClearCache()':  ['<C-I>'],
-            \ }                                         " reload with Ctrl-I
+            \   'PrtExpandDir()':   [],
+            \ }
 
 " Pathfinder.vim {{{2
 let g:pathfinder_targets = ["compile_commands.json", "tags", ".git"] " pathfinder heuristic
@@ -197,7 +234,6 @@ function! ToggleNERDTree()
     endif
 endfunction
 let g:NERDTreeHijackNetrw = 1
-let g:NERDTreeGitStatusUseNerdFonts = 1
 let g:NERDTreeQuitOnOpen = 1
 
 nnoremap <C-K> :call ToggleNERDTree()<CR>
@@ -208,9 +244,9 @@ let g:ale_lint_on_insert_leave = 0          " do not check when leaving insert m
 let g:ale_lint_on_filetype_changed = 0
 let g:ale_lint_on_enter = 0
 let g:ale_hover_cursor = 0                  " do not print info about hovered
-autocmd filetype python set omnifunc=ale#completion#OmniFunc
+autocmd FileType python setlocal omnifunc=ale#completion#OmniFunc
 " use Language server for following definitions
-autocmd filetype python nmap gd :ALEGoToDefinition<CR>
+autocmd FileType python nnoremap <buffer> <silent> gd :ALEGoToDefinition<CR>
 
 let g:ale_linters_explicit = 1  "only run configured linters
 " configure linters
@@ -225,11 +261,13 @@ let g:ale_linters = {
 \   "html"      : ["angular"],
 \}
 
-" Flake8 global config file
-let g:ale_python_flake8_options = '--append-config ~/.flake8'
+" Flake8 global config file, if this machine has one
+if filereadable(expand('~/.flake8'))
+    let g:ale_python_flake8_options = '--append-config ~/.flake8'
+endif
 
-" go to references
-nmap gr :ALEFindReferences<CR>
+" go to references: into the quickfix list, like rgo and :grep (]q, [q, :copen)
+nnoremap <silent> gr :ALEFindReferences -quickfix<CR>
 
 " InSyntaxChange {{{2
 
@@ -242,20 +280,13 @@ let g:python_highlight_all = 1
 let OmniCpp_MayCompleteDot = 0      " Do not automatically start completion on dot
 let OmniCpp_MayCompleteArrow = 0    " Do not automatically start completion on arrow
 
-" Jedi-vim {{{2
-"let g:jedi#show_call_signatures = 0
-"let g:jedi#auto_vim_configuration = 0
-"let g:jedi#popup_on_dot = 0
-"" I don't need the documentation for the word under the cursor, and <K> is
-"" already mapped.
-"let g:jedi#documentation_command = ''
-
 
 " Language specific configuration {{{1
 " git commit {{{2
-au FileType gitcommit   setlocal spelllang=en_us spell textwidth=72
+au FileType gitcommit   setlocal spell textwidth=72 | call s:SetSpellLang('en_gb')
 au FileType yaml        setlocal textwidth=80 colorcolumn=81 foldmethod=indent foldlevel=99
-au FileType markdown    setlocal spelllang=en_us spell textwidth=80 colorcolumn=81
+au FileType markdown    setlocal spell textwidth=80 colorcolumn=81 | call s:SetSpellLang('en_gb')
+au FileType mail        setlocal spell | call s:SetSpellLang('de,en_gb')
 au FileType python      setlocal textwidth=99 colorcolumn=100
 au FileType html        setlocal shiftwidth=2 tabstop=2
 au FileType htmlangular setlocal ft=html

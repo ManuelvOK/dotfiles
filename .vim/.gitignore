@@ -1,3 +1,6 @@
 bundle
 tags
 .netrwhist
+# compiled word lists and downloaded dictionaries, see make vim
+spell/*.spl
+spell/*.sug
