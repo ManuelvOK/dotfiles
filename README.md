@@ -1,0 +1,117 @@
+# dotfiles
+
+These are my dotfiles. I use this repository as a personal backup and for
+synchronization between my machines.
+
+## What's in here
+
+| Path                             | What                                                           |
+|----------------------------------|----------------------------------------------------------------|
+| `.zshrc`, `.zprofile`, `.zsh/`   | zsh, with a cheatsheet of its features in `.zsh/cheatsheet.md` |
+| `.vim/`                          | vim, plugins via Vundle                                        |
+| `.gitconfig`                     | git, with delta as pager                                       |
+| `.gnupg/`                        | GnuPG. gpg-agent also serves as ssh agent                      |
+| `.mutt/`, `scripts/mutt-tools`   | neomutt with one profile per account, mbsync for syncing       |
+| `.xinitrc`, `.Xresources`        | X session: dwm, dwmblocks, st, slock                           |
+| `.config/`                       | dunst, ranger, redshift, zathura, environment.d, systemd       |
+| `scripts/`                       | helpers called by dwm and dwmblocks (volume, media, …)         |
+| `private/`                       | private submodule: mail accounts, aliases, mbsync              |
+
+## Setup
+
+```sh
+git clone --recursive https://github.com/ManuelvOK/dotfiles ~/dotfiles
+cd ~/dotfiles
+make
+```
+
+`make` sets up everything. Each area also has its own target, which installs
+the packages the area needs and links its files. `make zsh` touches nothing
+from the mail setup. sudo only asks when a package is actually missing.
+
+| Target        | Links                                                     | Also                                                     |
+|---------------|-----------------------------------------------------------|----------------------------------------------------------|
+| `zsh`         | `.zshrc`, `.zprofile`, `.zsh`                             | makes zsh the login shell                                |
+| `vim`         | `.vim`                                                    | installs Vundle and updates the plugins                  |
+| `git`         | `.gitconfig`                                              |                                                          |
+| `gpg`         | `.gnupg`, `.config/environment.d/vars.conf`               |                                                          |
+| `mail`        | `.mutt`, `.mailcap`, `.mbsyncrc` and mutt accounts        | needs `gpg`                                              |
+| `xsession`    | `.xinitrc`, `.Xresources`, systemd units, redshift, dunst | builds dwm, st, slock and dwmblocks-async, needs yay     |
+| `ranger`      | `.config/ranger`                                          |                                                          |
+| `zathura`     | `.config/zathura`                                         |                                                          |
+| `stalonetray` | `.stalonetrayrc`                                          |                                                          |
+| `alsa`        | `.asoundrc`                                               |                                                          |
+| `ripgrep`     | `.ripgreprc`                                              | `.zprofile` points `RIPGREP_CONFIG_PATH` at it           |
+| `jshint`      | `.jshintrc`                                               | jshint itself comes from npm                             |
+
+`private` is a private repository. Without access to it, the clone of that
+submodule fails and `make mail` cannot link the accounts. Everything else
+works.
+
+| Other target            | Does                                                                         |
+|-------------------------|------------------------------------------------------------------------------|
+| `make check`            | lists repo files that are not linked, and dangling links                     |
+| `make clean-links`      | removes dangling links that point into the repo                              |
+| `make yay-install`      | installs yay from the AUR                                                    |
+| `make <name>-install`   | clones my fork of dwm, st, slock or dwmblocks-async to `~/projects/suckless` |
+|                         | (if needed), builds it and installs it to `/usr/local`                       |
+| `make <name>-uninstall` | uninstalls it again                                                          |
+
+A new file in the repo has to be added to the `<AREA>_LINKS` of its area in
+the Makefile. Until then, `make check` lists it as not linked.
+
+## How linking works
+
+- Top-level dotfiles and directories (`.zshrc`, `.vim`, `.gnupg`, …) are
+  linked as a whole.
+- `~/.config` is a real directory. The files below `.config` are linked one by
+  one. Everything else programs keep there stays out of the repo.
+- Some programs save their config by writing a new file over the link. The
+  file then silently stops being the one in the repo. `make check` lists those.
+- After deleting a file from the repo, `make clean-links` removes its link.
+
+## Git identity
+
+`.gitconfig` sets my private identity. Repos below `~/work/` include
+`~/.gitconfig-work`, which only exists on the work machine and is not part of
+this repo. It holds a `[user]` block with the work identity. Without the file,
+git skips the include.
+
+A single repo can also set its own identity with `git config user.email …`
+inside it.
+
+## X session
+
+`.zprofile` runs `startx` on tty1. `.xinitrc` then
+
+1. hands `DISPLAY` to systemd and D-Bus (`/etc/X11/xinit/xinitrc.d`),
+2. starts `dwm-session.target`, which binds `graphical-session.target`,
+3. starts dwmblocks and xss-lock, which locks the screen with slock after 10
+   minutes without input and before suspend,
+4. runs dwm and stops the target again when dwm quits.
+
+xss-lock runs from `.xinitrc` and not as a user service, because it finds its
+logind session through its own PID.
+
+Services that belong to the X session are pulled in by `dwm-session.target`
+and are `PartOf=graphical-session.target`. See `.config/systemd/user/`.
+
+| Service        | Does                                                                                        |
+|----------------|---------------------------------------------------------------------------------------------|
+| `redshift`     | warmer colours in the evening                                                               |
+| `battery-warn` | notifies when the laptop is docked but not charging, runs on battery, or the battery is low |
+
+`scripts/battery-warn` recognises the dock by its USB ID. A new dock goes into
+`DOCKS` at the top of the script.
+
+## Contribution
+
+These are MY dotfiles. I use this repository as a PERSONAL backup and for
+synchronization between MY machines.
+
+If you have a great addition in mind, consider creating your own dotfiles
+repository and I will steal it from you. If you are really kind, open an issue
+and point me to your solution.
+
+No pull requests. I will test everything locally and tweak with it a bit, then
+I'll commit it once I'm content.

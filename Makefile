@@ -1,86 +1,201 @@
-IGNORE = .git .gitmodules
-FILES = $(filter-out $(IGNORE), $(wildcard .*) $(patsubst private/%,%,$(wildcard private/.*)))
-LINKS = $(FILES:%=~/%)
+# Installs what the dotfiles need and links them into $(HOME), one target per
+# area. See README.md.
 
-BUNDLEDIR = .vim/bundle
-VUNDLEDIR = $(BUNDLEDIR)/Vundle.vim
+DOTFILES = $(HOME)/dotfiles
 
-all: $(LINKS)
+# Areas {{{1
+# <AREA>_LINKS are paths relative to the repo, linked to the same path below
+# $(HOME). <AREA>_PKGS are installed with pacman, <AREA>_AUR with yay.
 
-links: $(LINKS)
+ZSH_LINKS = .zshrc .zprofile .zsh
+ZSH_PKGS  = zsh fzf zsh-autosuggestions zsh-syntax-highlighting
 
-.PHONY: all vim st-install st-uninstall dwm-install dwm-uninstall slstatus-install slstatus-uninstall yay-install gnupg mutt-private
+VIM_LINKS = .vim
+VIM_PKGS  = gvim ctags vim-spell-de
 
-# TODO: switch to ~ before executing and use vpath
-~/.%:
-	if [ -e "$(HOME)/dotfiles/.$*" ]; then \
-		ln -s ~/dotfiles/.$* $@ ; \
-	elif [ -f "$(HOME)/dotfiles/private/.$*" ]; then \
-		ln -s ~/dotfiles/private/.$* $@ ; \
-	fi; \
-	if [ -d "$(HOME)/dotfiles/private/.$*" ]; then \
-		ln -s ~/dotfiles/private/.$*/* ~/.$*/; \
-	fi
+GIT_LINKS = .gitconfig
+GIT_PKGS  = git git-delta git-lfs
 
-~/.gnupg: gnupg
+GPG_LINKS = .gnupg .config/environment.d/vars.conf
+GPG_PKGS  = gnupg pinentry
 
-vim: $(VUNDLEDIR) ~/.vim
+MAIL_LINKS   = .mutt .mailcap
+# from the private submodule
+MAIL_PRIVATE = .mbsyncrc .mutt/accounts .mutt/aliases .mutt/foldertypes \
+               .mutt/common/private_colors
+MAIL_PKGS    = neomutt isync w3m colordiff
+
+XSESSION_LINKS = .xinitrc .Xresources \
+                 .config/systemd/user/dwm-session.target \
+                 .config/systemd/user/redshift.service.d/session.conf \
+                 .config/systemd/user/battery-warn.service \
+                 $(wildcard .config/redshift/* .config/dunst/*)
+# X, redshift, notifications, and what scripts/ calls for dwm and dwmblocks
+XSESSION_PKGS  = xorg-xinit xorg-xrdb xorg-xrandr xorg-xmodmap \
+                 xorg-setxkbmap xorg-xset redshift dunst libnotify \
+                 brightnessctl playerctl libpulse xss-lock
+XSESSION_AUR   = networkmanager-dmenu-git
+
+RANGER_LINKS = $(wildcard .config/ranger/*)
+RANGER_PKGS  = ranger
+
+ZATHURA_LINKS = $(wildcard .config/zathura/*)
+ZATHURA_PKGS  = zathura zathura-pdf-mupdf
+
+STALONETRAY_LINKS = .stalonetrayrc
+STALONETRAY_PKGS  = stalonetray
+
+ALSA_LINKS = .asoundrc
+
+RIPGREP_LINKS = .ripgreprc
+RIPGREP_PKGS  = ripgrep
+
+# jshint itself comes from npm
+JSHINT_LINKS = .jshintrc
+
+AREAS = zsh vim git gpg mail xsession ranger zathura stalonetray alsa \
+        ripgrep jshint
+
+LINKS = $(ZSH_LINKS) $(VIM_LINKS) $(GIT_LINKS) $(GPG_LINKS) $(MAIL_LINKS) \
+        $(XSESSION_LINKS) $(RANGER_LINKS) $(ZATHURA_LINKS) \
+        $(STALONETRAY_LINKS) $(ALSA_LINKS) $(RIPGREP_LINKS) $(JSHINT_LINKS)
+
+SUCKLESS     = dwm st slock dwmblocks-async
+SUCKLESS_DIR = $(HOME)/projects/suckless
+SUCKLESS_URL = https://github.com/ManuelvOK
+
+VUNDLEDIR = .vim/bundle/Vundle.vim
+
+.PHONY: all $(AREAS) check clean-links yay-install \
+        $(SUCKLESS:%=%-install) $(SUCKLESS:%=%-uninstall)
+
+all: $(AREAS)
+
+# Installs the packages in $(1) that are missing. pacman -T needs no root and
+# prints only the ones that are not installed, so sudo asks only when needed.
+define install
+	@missing=$$(pacman -T $(1)); \
+	[ -z "$$missing" ] || sudo pacman -S --needed $$missing
+endef
+
+define install-aur
+	@missing=$$(pacman -T $(1)); \
+	[ -z "$$missing" ] || yay -S --needed $$missing
+endef
+
+zsh: $(ZSH_LINKS:%=$(HOME)/%)
+	$(call install,$(ZSH_PKGS))
+	@# compare the name only, the login shell may be /bin/zsh or /usr/bin/zsh
+	@shell=$$(getent passwd $$(id -un) | cut -d: -f7); \
+	[ "$${shell##*/}" = zsh ] || chsh -s /usr/bin/zsh
+
+vim: $(VIM_LINKS:%=$(HOME)/%) | $(VUNDLEDIR)
+	$(call install,$(VIM_PKGS))
 	vim +PluginUpdate +PluginClean +qa
-	@# PluginUpdate updates the timestamp of $(BUNDLEDIR), thus it is newer
-	@# than $(VUNDLEDIR). Hence, make wants to clone vundle again during the
-	@# next execution, leading to a git error!
-	@# The hack below circumvents this.
-	@# Note: it also makes it unnecessary to list $(VUNDLEDIR) as an
-	@# order-only prerequisite, though it actually is one.
-	touch $(VUNDLEDIR)
-	cd ~/.vim && ./gen_stl_tags.sh
 
-gnupg:
-	chmod 700 .gnupg
+git: $(GIT_LINKS:%=$(HOME)/%)
+	$(call install,$(GIT_PKGS))
 
-$(VUNDLEDIR): $(BUNDLEDIR)
-	git clone https://github.com/gmarik/Vundle.vim.git $@
+gpg: $(GPG_LINKS:%=$(HOME)/%)
+	$(call install,$(GPG_PKGS))
+	chmod 700 $(DOTFILES)/.gnupg
 
-$(BUNDLEDIR):
-	mkdir $@
+mail: gpg $(MAIL_LINKS:%=$(HOME)/%) $(MAIL_PRIVATE:%=$(HOME)/%)
+	$(call install,$(MAIL_PKGS))
 
-st-install: /usr/bin/st
+xsession: $(XSESSION_LINKS:%=$(HOME)/%) \
+          /usr/local/bin/dwm /usr/local/bin/st /usr/local/bin/slock \
+          /usr/local/bin/dwmblocks | /usr/bin/yay
+	$(call install,$(XSESSION_PKGS))
+	$(call install-aur,$(XSESSION_AUR))
 
-/usr/bin/st:
-	(cd /tmp && [ -d st ] || git clone https://github.com/manuelthieme/st.git)
-	(cd /tmp/st; makepkg -fis)
+ranger: $(RANGER_LINKS:%=$(HOME)/%)
+	$(call install,$(RANGER_PKGS))
 
-st-uninstall:
-	sudo pacman -Runs st-patched
+zathura: $(ZATHURA_LINKS:%=$(HOME)/%)
+	$(call install,$(ZATHURA_PKGS))
 
-dwm-install: /usr/bin/dwm
+stalonetray: $(STALONETRAY_LINKS:%=$(HOME)/%)
+	$(call install,$(STALONETRAY_PKGS))
 
-/usr/bin/dwm:
-	(cd /tmp && [ -d dwm ] || git clone https://github.com/manuelthieme/dwm.git)
-	(cd /tmp/dwm; makepkg -fis)
+alsa: $(ALSA_LINKS:%=$(HOME)/%)
 
-dwm-uninstall:
-	sudo pacman -Runs dwm-patched
+ripgrep: $(RIPGREP_LINKS:%=$(HOME)/%)
+	$(call install,$(RIPGREP_PKGS))
 
-slstatus-install: /usr/bin/slstatus
+jshint: $(JSHINT_LINKS:%=$(HOME)/%)
 
-/usr/bin/slstatus:
-	(cd /tmp && [ -d slstatus ] || git clone https://github.com/manuelthieme/slstatus.git)
-	(cd /tmp/slstatus; makepkg -fis)
+# Linking {{{1
+TOP_LINKS    = $(filter-out .config/%, $(LINKS))
+CONFIG_LINKS = $(filter .config/%, $(LINKS))
 
-slstatus-uninstall:
-	sudo pacman -Runs slstatus-patched
+$(TOP_LINKS:%=$(HOME)/%): $(HOME)/%:
+	ln -s $(DOTFILES)/$* $@
 
-yay-install: /bin/yay
+# ~/.config used to be a link to the repo. Linking into it would write into
+# the repo itself.
+$(CONFIG_LINKS:%=$(HOME)/%): $(HOME)/%:
+	@[ ! -L $(HOME)/.config ] || \
+	  { echo "~/.config is a link, it must be a directory" >&2; exit 1; }
+	mkdir -p $(@D)
+	ln -s $(DOTFILES)/$* $@
 
-/bin/yay:
-	(cd /tmp && [ -d yay ] || git clone https://aur.archlinux.org/yay.git)
-	(cd /tmp/yay && makepkg -si)
+$(MAIL_PRIVATE:%=$(HOME)/%): $(HOME)/%:
+	ln -s $(DOTFILES)/private/$* $@
 
-PRIVATE_MUTT_LINKS = $(HOME)/.mutt/accounts $(HOME)/.mutt/common/private_colors \
-                     $(HOME)/.mutt/aliases $(HOME)/.mutt/foldertypes
+# Checking {{{1
+# Everything in the repo that should be linked, independent of the areas
+# above. A file that no area links shows up as not linked.
+IGNORE    = . .. .git .gitmodules .gitignore_global .config
+ALL_TOP   = $(filter-out $(IGNORE), $(wildcard .*))
+# Only tracked files. The wildcard skips deletions not yet committed.
+ALL_CONFIG = $(wildcard $(shell git -C $(DOTFILES) ls-files .config))
 
-mutt-private: $(PRIVATE_MUTT_LINKS)
+# Links that point into the repo but whose target is gone
+DANGLING = { find $(HOME) -maxdepth 1 -xtype l -lname '$(DOTFILES)/*'; \
+             find $(HOME)/.config/ -xtype l -lname '$(DOTFILES)/*'; }
 
-$(PRIVATE_MUTT_LINKS): $(HOME)/.mutt/%: $(HOME)/dotfiles/private/.mutt/% | $(HOME)/.mutt
-	ln -s $< $@
+# Reports files that are not linked, e.g. because a program saved a config
+# by replacing the link with a new file, and dangling links.
+check:
+	@for f in $(ALL_TOP) $(ALL_CONFIG); do \
+	  [ "$$(readlink $(HOME)/$$f)" = "$(DOTFILES)/$$f" ] || \
+	    echo "not linked: ~/$$f"; \
+	done
+	@for f in $(MAIL_PRIVATE); do \
+	  [ "$$(readlink $(HOME)/$$f)" = "$(DOTFILES)/private/$$f" ] || \
+	    echo "not linked: ~/$$f"; \
+	done
+	@$(DANGLING) | sed 's/^/dangling: /'
+
+clean-links:
+	$(DANGLING) | xargs -r rm -v
+
+# Building {{{1
+$(VUNDLEDIR):
+	git clone https://github.com/VundleVim/Vundle.vim.git $@
+
+yay-install: /usr/bin/yay
+
+/usr/bin/yay:
+	cd /tmp && { [ -d yay ] || git clone https://aur.archlinux.org/yay.git; }
+	cd /tmp/yay && makepkg -si
+
+# dwm, st, slock and dwmblocks-async are built from my forks and installed to
+# /usr/local. An existing clone is only rebuilt. The install lines call make
+# directly, because make -n would run them for real with $(MAKE).
+$(SUCKLESS_DIR)/%:
+	git clone $(SUCKLESS_URL)/$*.git $@
+
+$(SUCKLESS:%=%-install): %-install: | $(SUCKLESS_DIR)/%
+	$(MAKE) -C $(SUCKLESS_DIR)/$*
+	sudo make -C $(SUCKLESS_DIR)/$* install
+
+$(SUCKLESS:%=%-uninstall): %-uninstall:
+	sudo make -C $(SUCKLESS_DIR)/$* uninstall
+
+# xsession only needs the binaries. Installing again is up to <name>-install.
+/usr/local/bin/dwm:       ; $(MAKE) dwm-install
+/usr/local/bin/st:        ; $(MAKE) st-install
+/usr/local/bin/slock:     ; $(MAKE) slock-install
+/usr/local/bin/dwmblocks: ; $(MAKE) dwmblocks-async-install
