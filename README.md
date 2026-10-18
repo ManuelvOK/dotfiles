@@ -70,6 +70,48 @@ the Makefile. Until then, `make check` lists it as not linked.
   file then silently stops being the one in the repo. `make check` lists those.
 - After deleting a file from the repo, `make clean-links` removes its link.
 
+### Migrating from a linked `~/.config`
+
+Older checkouts linked `~/.config` itself to the repo, so every program kept
+its state inside the repo. The Makefile refuses to link into `.config` as
+long as `~/.config` is such a link. To migrate:
+
+1. Pull. If git refuses because untracked files under `.config` would be
+   overwritten (e.g. `environment.d/vars.conf`), move those aside, pull, and
+   compare them with the versions from the repo.
+2. Close programs that write to `~/.config`, e.g. Spotify, Signal and the
+   browser. Staying in X is fine.
+3. Move everything git does not track out of the repo, in zsh (in bash, `.*`
+   also matches `.` and `..`):
+
+   ```sh
+   unlink ~/.config && mkdir ~/.config      # unlink only removes a link
+   cd ~/dotfiles/.config
+   keep=($(git ls-files . | cut -d/ -f1 | sort -u))
+   for e in * .*; do
+     (( ${keep[(Ie)$e]} )) || mv -- "$e" ~/.config/
+   done
+   ls -A                                    # only the tracked directories
+   ```
+
+   It is all one filesystem, so `mv` only renames and is instant.
+4. Link the files, then check:
+
+   ```sh
+   cd ~/dotfiles && make gpg xsession ranger zathura && make check
+   ```
+
+   These are the areas with files in `.config`. Plain `make` also works, but
+   runs every area.
+5. Test:
+   - `systemctl --user daemon-reload`, then `systemctl --user status
+     dwm-session.target redshift battery-warn`: all active.
+   - On another tty, log in: `echo $SSH_AUTH_SOCK` points at gpg-agent and
+     `ssh-add -l` lists the key, so `environment.d` works.
+
+To undo it, move everything from `~/.config` back into `~/dotfiles/.config`,
+then `rmdir ~/.config && ln -s ~/dotfiles/.config ~/.config`.
+
 ## Git identity
 
 `.gitconfig` sets my private identity. Repos below `~/work/` include
