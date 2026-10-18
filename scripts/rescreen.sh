@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 readarray -td$'\n' connected_devices <<<"$(xrandr | grep " connected " | awk '{ print$1 }')"
 
