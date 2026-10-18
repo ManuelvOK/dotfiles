@@ -1,6 +1,10 @@
 [user]
-    name = Manuel Kalettka
-    email = manuel.kalettka@kernkonzept.com
+    # Private identity. Work repos override it, see README.md.
+    name = manuelvok
+    email = info@manuel-thieme.de
+# Work identity, only on the work machine. git skips a missing file.
+[includeIf "gitdir:~/work/"]
+    path = ~/.gitconfig-work
 [advice]
     detachedHead = false
     skippedCherryPicks = false
@@ -17,7 +21,6 @@
     ll = log --oneline
     ol = "log --all --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
     r  = reset HEAD~
-    rh = reset --hard HEAD~
     rb = rebase
     rbi = rebase --interactive
     rba = rebase --abort
@@ -29,16 +32,36 @@
     autoSetupRebase = always
     sort = committerdate
 [column]
-    ui = always column
+    ui = auto
 [core]
+    pager = delta
     editor = vim
     excludesFile = ~/dotfiles/.gitignore_global
+[delta]
+    navigate = true
+    line-numbers = true
+    side-by-side = true
+    tabs = 4
+    # git marks moved lines bold purple/cyan, and every other moved block bold
+    # blue/yellow (diff.colorMoved). Show them on dark backgrounds that fit
+    # delta instead.
+    map-styles = "bold purple => syntax #330f29, bold blue => syntax #3d1a36, bold cyan => syntax #271344, bold yellow => syntax #1a2d4a"
 [diff]
     tool = vimdiff
+    colorMoved = default
+    colorMovedWS = allow-indentation-change
+[filter "lfs"]
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+    process = git-lfs filter-process
+    required = true
+[interactive]
+    diffFilter = delta --color-only
 [merge]
     tool = vimdiff
+    conflictStyle = zdiff3
 [push]
-    default = tracking
+    default = upstream
 [rebase]
     autoStash = true
 [rerere]
@@ -46,5 +69,3 @@
 [status]
     short = true
     branch = true
-[color]
-    ui = auto

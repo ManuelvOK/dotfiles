@@ -3,3 +3,5 @@ __pycache__/
 .mypy_cache/
 *.orig
 .tags
+
+**/.claude/settings.local.json
