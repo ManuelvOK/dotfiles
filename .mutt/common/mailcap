@@ -12,7 +12,7 @@ text/x-patch;               cat %s | colordiff; copiousoutput;
 text/calendar;              icsviewer %s; copiousoutput;
 
 # other text files
-text/*;                     iconv -f latin1 %s; copiousoutput;
+text/*;                     iconv -f %{charset} -t utf-8 %s; copiousoutput;
 
 # MS Office files
 application/word;           mutt_view libreoffice %s;
