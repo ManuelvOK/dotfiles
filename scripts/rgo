@@ -1,3 +1,12 @@
 #!/usr/bin/env bash
+# Search with rg and load the matches into vim's quickfix list. The first
+# match opens right away. Without matches, vim does not start.
+#
+# In vim (]/[ from vim-unimpaired):
+#   ]q, [q              next / previous match
+#   ]Q, [Q              last / first match
+#   ]<C-Q>, [<C-Q>      first match in the next / previous file
+#   :copen              list all matches, <Enter> jumps to one
 
-rg "$@" | tee /dev/fd/2 | sed -E "s/(.*:[[:digit:]]+:).*/\1/g" | xargs -o vim
+matches=$(rg --vimgrep "$@") || exit
+vim -q <(printf '%s\n' "$matches")

@@ -238,8 +238,23 @@ Git status is shown next to each file: modified, staged, untracked, …
 | `:e src/main.c:42:7`    | the same from inside vim, column 7          |
 | `gF` on `src/main.c:42` | open the file under the cursor at that line |
 
-`scripts/rgo` builds on this: `rgo pattern` runs `rg` and opens every match
-in vim at its line.
+### rgo: search, then jump through the matches
+
+`rgo pattern [rg options]` (in `scripts/`) runs `rg` and loads the matches into
+vim's quickfix list. vim opens at the first match, then vim-unimpaired moves
+through the rest:
+
+| Keys               | Effect                                   |
+|--------------------|------------------------------------------|
+| `]q`, `[q`         | next / previous match                    |
+| `]Q`, `[Q`         | last / first match                       |
+| `]<C-Q>`, `[<C-Q>` | first match in the next / previous file  |
+| `:copen`           | list all matches, `<Enter>` jumps to one |
+| `:cclose`          | close that list again                    |
+
+The same keys work after `:grep`, `:make` and `gr` (ALE's references).
+`<C-Q>` reaches vim because `.zshrc` switches off terminal flow control.
+Without matches, `rgo` does not start vim.
 
 ### Project path (pathfinder.vim)
 
