@@ -37,7 +37,7 @@ from the mail setup. sudo only asks when a package is actually missing.
 | `vim`         | `.vim`                                                    | installs Vundle and updates the plugins                  |
 | `git`         | `.gitconfig`                                              |                                                          |
 | `gpg`         | `.gnupg`, `.config/environment.d/vars.conf`               |                                                          |
-| `mail`        | `.mutt`, `.mailcap`, `.mbsyncrc` and mutt accounts        | needs `gpg`                                              |
+| `mail`        | `.mutt`, `.mbsyncrc` and mutt accounts                    | needs `gpg`                                              |
 | `ssh`         | `.ssh/config`                                             | needs `gpg`, which is the ssh agent                      |
 | `xsession`    | `.xinitrc`, `.Xresources`, systemd units, redshift, dunst | builds dwm, st, slock and dwmblocks-async, needs yay     |
 | `ranger`      | `.config/ranger`                                          |                                                          |
