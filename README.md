@@ -11,7 +11,7 @@ synchronization between my machines.
 | `.vim/`                          | vim, plugins via Vundle                                        |
 | `.gitconfig`                     | git, with delta as pager                                       |
 | `.gnupg/`                        | GnuPG. gpg-agent also serves as ssh agent                      |
-| `.mutt/`, `scripts/mutt-tools`   | neomutt with one profile per account, mbsync for syncing       |
+| `.mutt/`, `scripts/mutt-tools`   | mutt with one profile per account, mbsync for syncing          |
 | `.xinitrc`, `.Xresources`        | X session: dwm, dwmblocks, st, slock                           |
 | `.config/`                       | dunst, ranger, redshift, zathura, environment.d, systemd,      |
 |                                  | default applications (`mimeapps.list`)                         |

@@ -22,7 +22,7 @@ GPG_PKGS  = gnupg pinentry
 # The accounts and the ssh config come from the private submodule. Its
 # private.mk links them, see the end of this file.
 MAIL_LINKS = .mutt
-MAIL_PKGS  = neomutt isync w3m colordiff
+MAIL_PKGS  = mutt isync w3m colordiff
 
 SSH_PKGS = openssh
 
