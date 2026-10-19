@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+
+############################################################
+# mutt_profile
+#
+# Start mutt with the proper profile and account settings.
+#
+# License: GPLv3
+#
+# (c) Till Smejkal - till.smejkal+mutttools@ossmail.de
+############################################################
+
+# Global variables
+CONFIG_DIR=${HOME}/.mutt
+TEMP_DIR=${XDG_RUNTIME_DIR}/mutt/profiles
+
+# Helper functions
+function usage() {
+cat << EOF
+mutt_profile [OPTIONS] PROFILE ACCOUNT [MUTT_OPTIONS]
+
+Start mutt with special profile and account settings.
+
+Options:
+    --help
+    -h      Print this help message.
+
+    --no-title
+    -t      Do not update the title of the terminal.
+
+PROFILE     The profile which should be loaded for mutt.
+ACCOUNT     The account which should be loaded for mutt.
+MUTT_OPTIONS    Further options which should be passed
+                to mutt.
+EOF
+}
+
+# Main
+if [[ "$1" == "-h" || "$1"  == "--help" ]]; then
+    usage
+    exit 0
+elif [ $# -lt 2 ]; then
+    echo -en "2 argument expected, $# given.\n\n"
+    usage
+    exit 1
+fi
+
+# Extract arguments
+_no_title=false
+
+if [[ "$1" == "-t" || "$1" == "--no-title" ]]; then
+    _no_title=true
+    shift
+fi
+
+_profile=$1
+_account=$2
+shift 2
+
+if [[ ! -e ${CONFIG_DIR}/profiles/$_profile ]]; then
+    echo "There is non such profile $_profile!"
+    exit 2
+fi
+
+if [[ ! -d ${CONFIG_DIR}/accounts/$_account ]]; then
+    echo "There is non such account $_account!"
+    exit 2
+fi
+
+# Create temporary copy of the mutt configuration file.
+mkdir -p ${TEMP_DIR}
+_config=$(mktemp -p ${TEMP_DIR})
+cp ${CONFIG_DIR}/config ${_config}
+
+# Post process the configuration file.
+sed -i "s/<profile>/${_profile}/g" ${_config}
+sed -i "s/<account>/${_account}/g" ${_config}
+
+# Set a proper terminal title.
+if [[ $_no_title == false ]]; then
+    echo -e "\033]2;Mutt $_profile - $_account\007"
+fi
+
+mutt -F ${_config} $@
+rm -f ${_config}

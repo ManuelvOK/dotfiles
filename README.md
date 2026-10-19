@@ -11,7 +11,7 @@ synchronization between my machines.
 | `.vim/`                          | vim, plugins via Vundle                                        |
 | `.gitconfig`                     | git, with delta as pager                                       |
 | `.gnupg/`                        | GnuPG. gpg-agent also serves as ssh agent                      |
-| `.mutt/`, `scripts/mutt-tools`   | mutt with one profile per account, mbsync for syncing          |
+| `.mutt/`, `scripts/mutt_*`       | mutt with one profile per account, mbsync for syncing          |
 | `.xinitrc`, `.Xresources`        | X session: dwm, dwmblocks, st, slock                           |
 | `.config/`                       | dunst, ranger, redshift, zathura, environment.d, systemd,      |
 |                                  | default applications (`mimeapps.list`)                         |
@@ -164,3 +164,9 @@ and point me to your solution.
 
 No pull requests. I will test everything locally and tweak with it a bit, then
 I'll commit it once I'm content.
+
+## License
+
+WTFPL, see `LICENSE`. The exceptions are `scripts/mutt_profile`,
+`scripts/mutt_compose` and `scripts/mutt_view`. They come from Till Smejkal's
+mutt-tools and are under the GPLv3, see `scripts/GPL-3.0.txt`.

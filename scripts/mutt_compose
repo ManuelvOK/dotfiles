@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+
+############################################################
+# mutt_compose
+#
+# Script which extracts all mutt mailbox definitions for one
+# account form one mailbox file and put it into another.
+#
+# License: GPLv3
+#
+# (c) Till Smejkal - till.smejkal+mutttools@ossmail.de
+############################################################
+
+# Global variables
+TEMP_DIR=${XDG_RUNTIME_DIR:-/tmp}/mutt/compose
+
+# Helper functions
+function usage() {
+cat << EOF
+mutt_compose [OPTIONS] ACCOUNT TEMPLATE
+
+Compose emails from mutt in a different window so that mutt is
+not blocked while writing the mail.
+
+Options:
+    --help
+    -h      Print this help message.
+
+ACCOUNT     The name of the mail account.
+TEMPLATE    The mail template which should be further edited.
+EOF
+}
+
+
+# Main
+if [[ "$1" == "-h" || "$1"  == "--help" ]]; then
+    usage
+    exit 0
+elif [ $# -ne 2 ]; then
+    echo -en "2 argument expected, $# given.\n\n"
+    usage
+    exit 1
+fi
+
+# Parse arguments
+_account=$1
+_mail=$2
+
+_title=$(cat ${_mail} | grep "Subject:" | sed "s/[A-Za-z]*:[ ]*//")
+
+# Create a temporary copy of the mail.
+mkdir -p ${TEMP_DIR}
+_tmp_mail=$(mktemp -p ${TEMP_DIR})
+cp ${_mail} ${_tmp_mail}
+
+# Run the compose instance of mutt in the background and delete
+# everything after the mail is sent.
+(
+    st -n Compose -t "Compose Mail - ${_title}" \
+        -e zsh -ic "mutt_profile --no-title compose ${_account} -H ${_tmp_mail} 2>/dev/null"
+    rm -f $_tmp_mail
+) &

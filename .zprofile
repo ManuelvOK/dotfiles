@@ -8,7 +8,6 @@ set +a
 
 typeset -U path
 path=($path ~/dotfiles/scripts)
-path=($path ~/dotfiles/scripts/mutt-tools)
 path=($path ~/.local/bin)
 
 export XCURSOR_SIZE=24

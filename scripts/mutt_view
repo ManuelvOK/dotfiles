@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+
+############################################################
+# mutt_view
+#
+# Script which can run commands started by mutt in the
+# background.
+#
+# License: GPLv3
+#
+# (c) Till Smejkal - till.smejkal+mutttools@ossmail.de
+############################################################
+
+# Global variables
+TEMP_DIR=${XDG_RUNTIME_DIR:-/tmp}/mutt/view
+
+# Helper functions
+function usage() {
+cat << EOF
+mutt_view [OPTIONS] VIEWER [VIEWER_OPTIONS] FILE
+
+Run a viewer for files from mutt so that it does not block
+mutt while viewing.
+
+Options:
+    --help
+    -h      Print this help message.
+
+VIEWER      The viewer program.
+VIEWER_OPTIONS  Optional arguments which should be passed to
+                the viewer.
+FILE        The file which should be viewed by the viewer.
+EOF
+}
+
+# Main
+if [[ "$1" == "-h" || "$1"  == "--help" ]]; then
+    usage
+    exit 0
+elif [ $# -lt 2 ]; then
+    echo -en "2 argument expected, $# given.\n\n"
+    usage
+    exit 1
+fi
+
+# Extract arguments
+_viewer="$1"
+shift
+
+while [ "$#" -gt "1" ]; do
+    _options="$_options $1"
+    shift
+done
+
+_file=$1
+
+# Create a temporary copy of the file.
+mkdir -p "${TEMP_DIR}"
+_tmp_dir=$(mktemp -d -p "${TEMP_DIR}")
+cp "$_file" "${_tmp_dir}"
+
+# Run the viewer in the background and delete everything
+# when the viewer is done.
+(
+    "$_viewer" $_options "${_tmp_dir}/$(basename "$_file")" 2>/dev/null
+    rm -rf "$_tmp_dir"
+) &
