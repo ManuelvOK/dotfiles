@@ -23,6 +23,7 @@ GPG_PKGS  = gnupg pinentry
 # private.mk links them, see the end of this file.
 MAIL_LINKS = .mutt
 MAIL_PKGS  = mutt isync w3m colordiff
+MAIL_AUR   = mutt-ics
 
 SSH_PKGS = openssh
 
@@ -104,8 +105,9 @@ gpg: $(GPG_LINKS:%=$(HOME)/%)
 	$(call install,$(GPG_PKGS))
 	chmod 700 $(DOTFILES)/.gnupg
 
-mail: gpg $(MAIL_LINKS:%=$(HOME)/%)
+mail: gpg $(MAIL_LINKS:%=$(HOME)/%) | /usr/bin/yay
 	$(call install,$(MAIL_PKGS))
+	$(call install-aur,$(MAIL_AUR))
 
 ssh: gpg
 	$(call install,$(SSH_PKGS))

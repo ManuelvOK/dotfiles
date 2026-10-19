@@ -9,32 +9,19 @@ text/x-diff;                cat %s | colordiff; copiousoutput;
 text/x-patch;               cat %s | colordiff; copiousoutput;
 
 # Calendar Events
-text/calendar;              icsviewer %s; copiousoutput;
+text/calendar;              mutt-ics; copiousoutput;
+application/ics;            mutt-ics; copiousoutput;
 
 # other text files
 text/*;                     iconv -f %{charset} -t utf-8 %s; copiousoutput;
 
-# MS Office files
-application/word;           mutt_view libreoffice %s;
-application/msword;         mutt_view libreoffice %s;
-application/vnd.msword;     mutt_view libreoffice %s;
-
-application/excel;          mutt_view libreoffice %s;
-application/msexcel;        mutt_view libreoffice %s;
-application/vnd.msexcel;    mutt_view libreoffice %s;
-
-application/powerpoint;     mutt_view libreoffice %s;
-application/mspowerpoint;   mutt_view libreoffice %s;
-application/vnd.mspowerpoint; mutt_view libreoffice %s;
-
-# libreoffice files
-application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; mutt_view libreoffice %s;
-
-# PDF files
-application/pdf;            mutt_view zathura %s;
-
-# Pictures
-image/*;                    mutt_view sxiv %s;
+# Everything else opens with the default application from mimeapps.list,
+# like xdg-open in a shell. xdg-open looks at the content, so this also works
+# for attachments that were sent as application/octet-stream.
+application/*;              mutt_view xdg-open %s;
+image/*;                    mutt_view xdg-open %s;
+audio/*;                    mutt_view xdg-open %s;
+video/*;                    mutt_view xdg-open %s;
 
 # vim:ft=mailcap
 
