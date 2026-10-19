@@ -3,8 +3,8 @@
 ############################################################
 # mutt_compose
 #
-# Script which extracts all mutt mailbox definitions for one
-# account form one mailbox file and put it into another.
+# Script which runs a mutt instance in compose mode in a new
+# terminal window, so that the reading mutt is not blocked.
 #
 # License: GPLv3
 #
@@ -18,6 +18,8 @@ TEMP_DIR=${XDG_RUNTIME_DIR:-/tmp}/mutt/compose
 function usage() {
 cat << EOF
 mutt_compose [OPTIONS] ACCOUNT TEMPLATE
+mutt_compose --forward ACCOUNT < MESSAGE
+mutt_compose --recall ACCOUNT
 
 Compose emails from mutt in a different window so that mutt is
 not blocked while writing the mail.
@@ -25,10 +27,36 @@ not blocked while writing the mail.
 Options:
     --help
     -h      Print this help message.
+    --forward
+            Forward the message from stdin. The new window has the
+            whole message, so attachments are forwarded as well.
+    --recall
+            Recall a postponed message, with its attachments.
 
 ACCOUNT     The name of the mail account.
 TEMPLATE    The mail template which should be further edited.
 EOF
+}
+
+# Prints a mutt_profile call for the compose profile, quoted for a shell.
+function compose_mutt() {
+    echo "mutt_profile --no-title compose $(printf '%q ' "$@") 2>/dev/null"
+}
+
+# Runs COMMAND in a new terminal in the background and deletes TMP
+# after the window is closed. zsh -i sets GPG_TTY for pinentry.
+function compose_window() {
+    local _title=$1
+    local _tmp=$2
+    local _command=$3
+    (
+        st -n Compose -t "${_title}" -e zsh -ic "${_command}"
+        rm -rf "${_tmp}"
+    ) </dev/null >/dev/null 2>&1 &
+}
+
+function subject() {
+    grep -m 1 "^Subject:" "$1" | sed "s/[A-Za-z]*:[ ]*//"
 }
 
 
@@ -36,27 +64,57 @@ EOF
 if [[ "$1" == "-h" || "$1"  == "--help" ]]; then
     usage
     exit 0
-elif [ $# -ne 2 ]; then
-    echo -en "2 argument expected, $# given.\n\n"
+fi
+
+_mode=edit
+if [[ "$1" == "--forward" || "$1" == "--recall" ]]; then
+    _mode=${1#--}
+    shift
+fi
+
+if [[ $_mode == edit && $# -ne 2 || $_mode != edit && $# -ne 1 ]]; then
+    echo -en "Wrong number of arguments.\n\n"
     usage
     exit 1
 fi
 
 # Parse arguments
 _account=$1
-_mail=$2
+mkdir -p "${TEMP_DIR}"
 
-_title=$(cat ${_mail} | grep "Subject:" | sed "s/[A-Za-z]*:[ ]*//")
-
-# Create a temporary copy of the mail.
-mkdir -p ${TEMP_DIR}
-_tmp_mail=$(mktemp -p ${TEMP_DIR})
-cp ${_mail} ${_tmp_mail}
-
-# Run the compose instance of mutt in the background and delete
-# everything after the mail is sent.
-(
-    st -n Compose -t "Compose Mail - ${_title}" \
-        -e zsh -ic "mutt_profile --no-title compose ${_account} -H ${_tmp_mail} 2>/dev/null"
-    rm -f $_tmp_mail
-) &
+case $_mode in
+edit)
+    # Create a temporary copy of the mail.
+    _tmp_mail=$(mktemp -p "${TEMP_DIR}")
+    cp "$2" "${_tmp_mail}"
+    compose_window "Compose Mail - $(subject "${_tmp_mail}")" "${_tmp_mail}" \
+        "$(compose_mutt "${_account}" -H "${_tmp_mail}")"
+    ;;
+forward)
+    # A first mutt forwards the message from a Maildir of its own and
+    # postpones the result without asking anything, so the keys pushed
+    # in advance end up in the right menus. A second mutt recalls that
+    # draft with its attachments and exits after sending, like -H does.
+    # Recalling always starts the editor, so the editor is a no-op
+    # until e or E in the compose menu sets it back. send2-hook switches
+    # back to the account's drafts, so postponing keeps the message.
+    _tmp_dir=$(mktemp -d -p "${TEMP_DIR}")
+    mkdir -p "${_tmp_dir}"/{message,drafts}/{cur,new,tmp}
+    cat > "${_tmp_dir}/message/cur/forward:2,S"
+    _forward=$(compose_mutt "${_account}" -f "${_tmp_dir}/message" \
+        -e "set postponed=${_tmp_dir}/drafts" \
+        -e "set editor=true forward_attachments=yes abort_unmodified=no" \
+        -e "push <forward-message><postpone-message><quit>")
+    _recall=$(compose_mutt "${_account}" -p \
+        -e "set my_postponed=\$postponed postponed=${_tmp_dir}/drafts" \
+        -e "set my_editor=\$editor editor=true" \
+        -e "send2-hook . 'set postponed=\$my_postponed'" \
+        -e "macro compose e '<enter-command>set editor=\$my_editor<enter><edit-message>'" \
+        -e "macro compose E '<enter-command>set editor=\$my_editor<enter><edit-headers>'")
+    compose_window "Forward Mail - $(subject "${_tmp_dir}/message/cur/forward:2,S")" \
+        "${_tmp_dir}" "${_forward} && ${_recall}"
+    ;;
+recall)
+    compose_window "Recall Mail" "" "$(compose_mutt "${_account}" -p)"
+    ;;
+esac

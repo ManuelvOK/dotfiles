@@ -81,5 +81,5 @@ if [[ $_no_title == false ]]; then
     echo -e "\033]2;Mutt $_profile - $_account\007"
 fi
 
-mutt -F ${_config} $@
+mutt -F "${_config}" "$@"
 rm -f ${_config}

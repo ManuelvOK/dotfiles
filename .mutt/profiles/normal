@@ -4,6 +4,11 @@
 
 # Behavioral settings
 set editor="mutt_compose $my_account %s"
+# Forwards and drafts carry attachments, which the editor never sees. So the
+# new window gets the whole message or recalls the draft itself.
+set recall=no               # m does not offer drafts, R recalls them
+macro index,pager f "<pipe-message>mutt_compose --forward $my_account<enter>" "forward in a new window"
+macro index R "<shell-escape>mutt_compose --recall $my_account<enter>" "recall a draft in a new window"
 set edit_headers
 set text_flowed = yes
 set ispell = 'aspell -e -c'
