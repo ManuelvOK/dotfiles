@@ -36,7 +36,4 @@ bind pager,index    \Cn         sidebar-next
 bind pager,index    \Co         sidebar-open
 bind pager,index    \Cu         sidebar-next-new
 
-macro pager,index    \Ce        '<enter-command>toggle side_visible<enter>'     "Toggle sidebar"
-
-
 # vim:ft=muttrc

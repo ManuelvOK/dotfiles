@@ -27,7 +27,7 @@ source $my_common_dir/addressbook
 source $my_common_dir/gpg
 
 #########################
-# MSMTP settings
+# Sending
 #########################
 source $my_common_dir/sending
 

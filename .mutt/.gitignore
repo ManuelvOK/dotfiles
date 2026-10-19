@@ -5,5 +5,4 @@ common/private_colors
 !config
 !profiles
 !profiles/**/*
-!mailcap
 !.gitignore

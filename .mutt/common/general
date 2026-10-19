@@ -14,7 +14,7 @@ set status_on_top           # Status bar on top.
 unset wait_key              # Don't ask to press a key
 
 set smart_wrap              # Try to wrap lines at word bounderies
-set markers                 # Mark wrapped lines with "+"
+unset markers               # Do not mark wrapped lines with "+"
 set tilde                   # Pad empty lines with "~"
 
 set sig_dashes              # A signature must always start with a "-- "
@@ -22,9 +22,7 @@ set sig_dashes              # A signature must always start with a "-- "
 set mail_check_stats
 set mail_check_stats_interval=60
 
-set smart_wrap
 set wrap=120
-unset markers
 
 set pager_stop
 

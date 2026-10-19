@@ -13,7 +13,6 @@ set forward_quote           # Quote the email body when forwarding
 set include                 # Quote the email body when replying
 set reverse_name            # Reply with the address used in the TO/CC header
 set reverse_realname        # Reply with the name used in the TO/CC header
-set reverse_alias           # Show alias name instead of the mail
 
 set mail_check=60           # Check for new mail every 60 seconds.
 set timeout=60              # Only wait 60 seconds in menus or other interactive operations
@@ -23,7 +22,6 @@ set smime_ask_cert_label = no
 
 set pager_index_lines=15    # Show 15 message headers from your message index above an email you are reading
 set pager_context=5         # Retain 5 lines of previous page when scrolling.
-set pager_stop
 
 set narrow_tree             # Use a smaller tree structure for threads
 
@@ -73,7 +71,7 @@ source $my_common_dir/gpg
 source $my_common_dir/sidebar
 
 #########################
-# MSMTP Settings
+# Sending
 #########################
 source $my_common_dir/sending
 
@@ -81,12 +79,6 @@ source $my_common_dir/sending
 # Keybindings and Macros
 #########################
 source $my_common_dir/keybindings
-
-#########################
-# Tools
-#########################
-source $my_common_dir/search
-source $my_common_dir/urls
 
 #########################
 # Format Settings
