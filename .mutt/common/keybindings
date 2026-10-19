@@ -44,12 +44,6 @@ bind pager                          \CY previous-line
 bind index                          \CE next-entry
 bind index                          \CY previous-entry
 
-## sidebar
-bind index,pager                    \Ch sidebar-toggle-visible
-bind index,pager                    \Ck sidebar-prev
-bind index,pager                    \Cj sidebar-next
-bind index,pager                    \Cl sidebar-open
-
 # Saner copy/move dialogs
 macro index                         C "<copy-message>?<toggle-mailboxes>" "copy a message to a mailbox"
 macro index                         M "<save-message>?<toggle-mailboxes>" "move a message to a mailbox"

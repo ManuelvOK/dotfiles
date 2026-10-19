@@ -31,9 +31,10 @@ color sidebar_new           yellow      default
 #########################
 # Keybindings
 #########################
-bind pager,index    \Cp         sidebar-prev
-bind pager,index    \Cn         sidebar-next
-bind pager,index    \Co         sidebar-open
+bind pager,index    \Ch         sidebar-toggle-visible
+bind pager,index    \Ck         sidebar-prev
+bind pager,index    \Cj         sidebar-next
+bind pager,index    \Cl         sidebar-open
 bind pager,index    \Cu         sidebar-next-new
 
 # vim:ft=muttrc
