@@ -25,6 +25,10 @@ MAIL_PRIVATE = .mbsyncrc .mutt/accounts .mutt/aliases .mutt/foldertypes \
                .mutt/common/private_colors
 MAIL_PKGS    = neomutt isync w3m colordiff
 
+# from the private submodule, uses gpg-agent as ssh agent
+SSH_PRIVATE = .ssh/config
+SSH_PKGS    = openssh
+
 XSESSION_LINKS = .xinitrc .Xresources \
                  .config/systemd/user/dwm-session.target \
                  .config/systemd/user/redshift.service.d/session.conf \
@@ -53,8 +57,10 @@ RIPGREP_PKGS  = ripgrep
 # jshint itself comes from npm
 JSHINT_LINKS = .jshintrc
 
-AREAS = zsh vim git gpg mail xsession ranger zathura stalonetray alsa \
+AREAS = zsh vim git gpg mail ssh xsession ranger zathura stalonetray alsa \
         ripgrep jshint
+
+PRIVATE_LINKS = $(MAIL_PRIVATE) $(SSH_PRIVATE)
 
 LINKS = $(ZSH_LINKS) $(VIM_LINKS) $(GIT_LINKS) $(GPG_LINKS) $(MAIL_LINKS) \
         $(XSESSION_LINKS) $(RANGER_LINKS) $(ZATHURA_LINKS) \
@@ -103,6 +109,9 @@ gpg: $(GPG_LINKS:%=$(HOME)/%)
 mail: gpg $(MAIL_LINKS:%=$(HOME)/%) $(MAIL_PRIVATE:%=$(HOME)/%)
 	$(call install,$(MAIL_PKGS))
 
+ssh: gpg $(SSH_PRIVATE:%=$(HOME)/%)
+	$(call install,$(SSH_PKGS))
+
 xsession: $(XSESSION_LINKS:%=$(HOME)/%) \
           /usr/local/bin/dwm /usr/local/bin/st /usr/local/bin/slock \
           /usr/local/bin/dwmblocks | /usr/bin/yay
@@ -140,8 +149,13 @@ $(CONFIG_LINKS:%=$(HOME)/%): $(HOME)/%:
 	mkdir -p $(@D)
 	ln -s $(DOTFILES)/$* $@
 
-$(MAIL_PRIVATE:%=$(HOME)/%): $(HOME)/%:
+$(PRIVATE_LINKS:%=$(HOME)/%): $(HOME)/%:
 	ln -s $(DOTFILES)/private/$* $@
+
+$(HOME)/.ssh/config: | $(HOME)/.ssh
+
+$(HOME)/.ssh:
+	mkdir -m 700 $@
 
 # Checking {{{1
 # Everything in the repo that should be linked, independent of the areas
@@ -162,7 +176,7 @@ check:
 	  [ "$$(readlink $(HOME)/$$f)" = "$(DOTFILES)/$$f" ] || \
 	    echo "not linked: ~/$$f"; \
 	done
-	@for f in $(MAIL_PRIVATE); do \
+	@for f in $(PRIVATE_LINKS); do \
 	  [ "$$(readlink $(HOME)/$$f)" = "$(DOTFILES)/private/$$f" ] || \
 	    echo "not linked: ~/$$f"; \
 	done

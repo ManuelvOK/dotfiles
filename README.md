@@ -15,7 +15,7 @@ synchronization between my machines.
 | `.xinitrc`, `.Xresources`        | X session: dwm, dwmblocks, st, slock                           |
 | `.config/`                       | dunst, ranger, redshift, zathura, environment.d, systemd       |
 | `scripts/`                       | helpers called by dwm and dwmblocks (volume, media, …)         |
-| `private/`                       | private submodule: mail accounts, aliases, mbsync              |
+| `private/`                       | private submodule: mail accounts, aliases, mbsync, ssh config  |
 
 ## Setup
 
@@ -36,6 +36,7 @@ from the mail setup. sudo only asks when a package is actually missing.
 | `git`         | `.gitconfig`                                              |                                                          |
 | `gpg`         | `.gnupg`, `.config/environment.d/vars.conf`               |                                                          |
 | `mail`        | `.mutt`, `.mailcap`, `.mbsyncrc` and mutt accounts        | needs `gpg`                                              |
+| `ssh`         | `.ssh/config`                                             | needs `gpg`, which is the ssh agent                      |
 | `xsession`    | `.xinitrc`, `.Xresources`, systemd units, redshift, dunst | builds dwm, st, slock and dwmblocks-async, needs yay     |
 | `ranger`      | `.config/ranger`                                          |                                                          |
 | `zathura`     | `.config/zathura`                                         |                                                          |
@@ -45,8 +46,8 @@ from the mail setup. sudo only asks when a package is actually missing.
 | `jshint`      | `.jshintrc`                                               | jshint itself comes from npm                             |
 
 `private` is a private repository. Without access to it, the clone of that
-submodule fails and `make mail` cannot link the accounts. Everything else
-works.
+submodule fails and `make mail` and `make ssh` cannot link their files.
+Everything else works.
 
 | Other target            | Does                                                                         |
 |-------------------------|------------------------------------------------------------------------------|
