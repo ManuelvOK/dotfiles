@@ -44,7 +44,7 @@ RANGER_PKGS  = ranger
 ZATHURA_LINKS = $(wildcard .config/zathura/*)
 ZATHURA_PKGS  = zathura zathura-pdf-mupdf
 
-XDG_LINKS = .config/mimeapps.list .local/share/applications/vim-st.desktop
+XDG_LINKS = .config/mimeapps.list $(wildcard .local/share/applications/*)
 XDG_PKGS  = xdg-utils sxiv
 
 STALONETRAY_LINKS = .stalonetrayrc
@@ -124,7 +124,7 @@ ranger: $(RANGER_LINKS:%=$(HOME)/%)
 zathura: $(ZATHURA_LINKS:%=$(HOME)/%)
 	$(call install,$(ZATHURA_PKGS))
 
-# PDFs go to zathura, code to vim in st (from xsession)
+# PDFs go to zathura, code to vim in st (from xsession), mailto: to mutt
 xdg: zathura $(XDG_LINKS:%=$(HOME)/%)
 	$(call install,$(XDG_PKGS))
 

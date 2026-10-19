@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=mutt
+Comment=Writes a mail to a mailto: link, asks for the account with dmenu
+Exec=mutt-mailto %u
+MimeType=x-scheme-handler/mailto;
+NoDisplay=true

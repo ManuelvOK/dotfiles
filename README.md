@@ -15,7 +15,7 @@ synchronization between my machines.
 | `.xinitrc`, `.Xresources`        | X session: dwm, dwmblocks, st, slock                           |
 | `.config/`                       | dunst, ranger, redshift, zathura, environment.d, systemd,      |
 |                                  | default applications (`mimeapps.list`)                         |
-| `.local/share/applications/`     | `vim-st.desktop`: vim in st as default application             |
+| `.local/share/applications/`     | vim in st and mutt as default applications                     |
 | `scripts/`                       | helpers called by dwm and dwmblocks (volume, media, …)         |
 | `private/`                       | private submodule: mail accounts, aliases, mbsync, ssh config  |
 
@@ -42,7 +42,8 @@ from the mail setup. sudo only asks when a package is actually missing.
 | `xsession`    | `.xinitrc`, `.Xresources`, systemd units, redshift, dunst | builds dwm, st, slock and dwmblocks-async, needs yay     |
 | `ranger`      | `.config/ranger`                                          |                                                          |
 | `zathura`     | `.config/zathura`                                         |                                                          |
-| `xdg`         | `mimeapps.list`, `vim-st.desktop`                         | PDFs to zathura, images to sxiv, code to vim in st       |
+| `xdg`         | `mimeapps.list`, desktop entries for vim and mutt         | PDFs to zathura, images to sxiv, code to vim in st,      |
+|               |                                                           | `mailto:` to mutt                                        |
 | `stalonetray` | `.stalonetrayrc`                                          |                                                          |
 | `alsa`        | `.asoundrc`                                               |                                                          |
 | `ripgrep`     | `.ripgreprc`                                              | `.zprofile` points `RIPGREP_CONFIG_PATH` at it           |

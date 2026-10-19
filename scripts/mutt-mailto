@@ -1,0 +1,7 @@
+#!/bin/sh
+# Opens a mailto: link in mutt. dmenu asks which account to write from.
+
+accounts=~/.mutt/accounts
+account=$(ls "$accounts" | dmenu -p 'mail from') || exit 0
+[ -d "$accounts/$account" ] || exit 1
+exec st -n Compose -t "Compose Mail" -e mutt_profile compose "$account" "$@"

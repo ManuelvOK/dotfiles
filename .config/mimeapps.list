@@ -27,6 +27,8 @@ text/x-diff=vim-st.desktop
 text/javascript=vim-st.desktop
 text/xml=vim-st.desktop
 application/json=vim-st.desktop
+# mail
+x-scheme-handler/mailto=mutt-mailto.desktop
 # web
 text/html=firefox.desktop
 x-scheme-handler/http=firefox.desktop
