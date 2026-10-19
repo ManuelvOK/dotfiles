@@ -1,4 +1,8 @@
-# HTML mails
+# HTML mails. <view-mailcap> (Enter in the attachment menu) takes the first
+# line and opens w3m, where links can be followed. auto_view only takes lines
+# with copiousoutput, so it skips the first line and shows the mail as text in
+# the pager.
+text/html;                  w3m -I %{charset} -T text/html %s; needsterminal; nametemplate=%s.html;
 text/html;                  w3m -I %{charset} -T text/html; copiousoutput;
 #text/html;                  elinks -dump -dump-charset utf-8 %s; nametemplate=%s.html; copiousoutput
 #text/html;                  mutt_view firefox %s; nametemplate=%s.html; test=runningx
