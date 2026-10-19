@@ -1,0 +1,44 @@
+[Default Applications]
+# documents
+application/pdf=org.pwmt.zathura-pdf-mupdf.desktop
+application/epub+zip=org.pwmt.zathura-pdf-mupdf.desktop
+# images
+image/png=sxiv.desktop
+image/jpeg=sxiv.desktop
+image/gif=sxiv.desktop
+image/webp=sxiv.desktop
+image/bmp=sxiv.desktop
+image/tiff=sxiv.desktop
+image/heif=sxiv.desktop
+image/jxl=sxiv.desktop
+image/svg+xml=sxiv.desktop
+# text and code, with the type names of file(1), which xdg-open uses
+text/plain=vim-st.desktop
+text/x-shellscript=vim-st.desktop
+text/x-script.python=vim-st.desktop
+text/x-c=vim-st.desktop
+text/x-c++=vim-st.desktop
+text/x-makefile=vim-st.desktop
+text/x-tex=vim-st.desktop
+text/x-lua=vim-st.desktop
+text/x-perl=vim-st.desktop
+text/x-java=vim-st.desktop
+text/x-diff=vim-st.desktop
+text/javascript=vim-st.desktop
+text/xml=vim-st.desktop
+application/json=vim-st.desktop
+# web
+text/html=firefox.desktop
+x-scheme-handler/http=firefox.desktop
+x-scheme-handler/https=firefox.desktop
+x-scheme-handler/about=firefox.desktop
+x-scheme-handler/unknown=firefox.desktop
+# registered by the apps themselves
+x-scheme-handler/sgnl=signal.desktop
+x-scheme-handler/signalcaptcha=signal.desktop
+x-scheme-handler/msteams=teams.desktop
+x-scheme-handler/claude-cli=claude-code-url-handler.desktop
+
+[Added Associations]
+x-scheme-handler/sgnl=signal.desktop;
+x-scheme-handler/signalcaptcha=signal.desktop;

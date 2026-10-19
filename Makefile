@@ -43,6 +43,9 @@ RANGER_PKGS  = ranger
 ZATHURA_LINKS = $(wildcard .config/zathura/*)
 ZATHURA_PKGS  = zathura zathura-pdf-mupdf
 
+XDG_LINKS = .config/mimeapps.list .local/share/applications/vim-st.desktop
+XDG_PKGS  = xdg-utils sxiv
+
 STALONETRAY_LINKS = .stalonetrayrc
 STALONETRAY_PKGS  = stalonetray
 
@@ -54,11 +57,11 @@ RIPGREP_PKGS  = ripgrep
 # jshint itself comes from npm
 JSHINT_LINKS = .jshintrc
 
-AREAS = zsh vim git gpg mail ssh xsession ranger zathura stalonetray alsa \
-        ripgrep jshint
+AREAS = zsh vim git gpg mail ssh xsession ranger zathura xdg stalonetray \
+        alsa ripgrep jshint
 
 LINKS = $(ZSH_LINKS) $(VIM_LINKS) $(GIT_LINKS) $(GPG_LINKS) $(MAIL_LINKS) \
-        $(XSESSION_LINKS) $(RANGER_LINKS) $(ZATHURA_LINKS) \
+        $(XSESSION_LINKS) $(RANGER_LINKS) $(ZATHURA_LINKS) $(XDG_LINKS) \
         $(STALONETRAY_LINKS) $(ALSA_LINKS) $(RIPGREP_LINKS) $(JSHINT_LINKS)
 
 SUCKLESS     = dwm st slock dwmblocks-async
@@ -119,6 +122,10 @@ ranger: $(RANGER_LINKS:%=$(HOME)/%)
 zathura: $(ZATHURA_LINKS:%=$(HOME)/%)
 	$(call install,$(ZATHURA_PKGS))
 
+# PDFs go to zathura, code to vim in st (from xsession)
+xdg: zathura $(XDG_LINKS:%=$(HOME)/%)
+	$(call install,$(XDG_PKGS))
+
 stalonetray: $(STALONETRAY_LINKS:%=$(HOME)/%)
 	$(call install,$(STALONETRAY_PKGS))
 
@@ -130,8 +137,9 @@ ripgrep: $(RIPGREP_LINKS:%=$(HOME)/%)
 jshint: $(JSHINT_LINKS:%=$(HOME)/%)
 
 # Linking {{{1
-TOP_LINKS    = $(filter-out .config/%, $(LINKS))
-CONFIG_LINKS = $(filter .config/%, $(LINKS))
+# .local is linked file by file, like .config
+TOP_LINKS    = $(filter-out .config/% .local/%, $(LINKS))
+CONFIG_LINKS = $(filter .config/% .local/%, $(LINKS))
 
 $(TOP_LINKS:%=$(HOME)/%): $(HOME)/%:
 	ln -s $(DOTFILES)/$* $@
@@ -147,14 +155,17 @@ $(CONFIG_LINKS:%=$(HOME)/%): $(HOME)/%:
 # Checking {{{1
 # Everything in the repo that should be linked, independent of the areas
 # above. A file that no area links shows up as not linked.
-IGNORE    = . .. .git .gitmodules .gitignore_global .config
+IGNORE    = . .. .git .gitmodules .gitignore_global .config .local
 ALL_TOP   = $(filter-out $(IGNORE), $(wildcard .*))
 # Only tracked files. The wildcard skips deletions not yet committed.
-ALL_CONFIG = $(wildcard $(shell git -C $(DOTFILES) ls-files .config))
+ALL_CONFIG = $(wildcard $(shell git -C $(DOTFILES) ls-files .config .local))
 
-# Links that point into the repo but whose target is gone
+# Links that point into the repo but whose target is gone. ~/.local is too
+# big to search as a whole, only its directories with links are searched.
 DANGLING = { find $(HOME) -maxdepth 1 -xtype l -lname '$(DOTFILES)/*'; \
-             find $(HOME)/.config/ -xtype l -lname '$(DOTFILES)/*'; }
+             find $(HOME)/.config/ -xtype l -lname '$(DOTFILES)/*'; \
+             find $(HOME)/.local/share/applications/ -maxdepth 1 -xtype l \
+               -lname '$(DOTFILES)/*'; }
 
 # Reports files that are not linked, e.g. because a program saved a config
 # by replacing the link with a new file, and dangling links.

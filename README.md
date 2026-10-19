@@ -13,7 +13,9 @@ synchronization between my machines.
 | `.gnupg/`                        | GnuPG. gpg-agent also serves as ssh agent                      |
 | `.mutt/`, `scripts/mutt-tools`   | neomutt with one profile per account, mbsync for syncing       |
 | `.xinitrc`, `.Xresources`        | X session: dwm, dwmblocks, st, slock                           |
-| `.config/`                       | dunst, ranger, redshift, zathura, environment.d, systemd       |
+| `.config/`                       | dunst, ranger, redshift, zathura, environment.d, systemd,      |
+|                                  | default applications (`mimeapps.list`)                         |
+| `.local/share/applications/`     | `vim-st.desktop`: vim in st as default application             |
 | `scripts/`                       | helpers called by dwm and dwmblocks (volume, media, …)         |
 | `private/`                       | private submodule: mail accounts, aliases, mbsync, ssh config  |
 
@@ -40,6 +42,7 @@ from the mail setup. sudo only asks when a package is actually missing.
 | `xsession`    | `.xinitrc`, `.Xresources`, systemd units, redshift, dunst | builds dwm, st, slock and dwmblocks-async, needs yay     |
 | `ranger`      | `.config/ranger`                                          |                                                          |
 | `zathura`     | `.config/zathura`                                         |                                                          |
+| `xdg`         | `mimeapps.list`, `vim-st.desktop`                         | PDFs to zathura, images to sxiv, code to vim in st       |
 | `stalonetray` | `.stalonetrayrc`                                          |                                                          |
 | `alsa`        | `.asoundrc`                                               |                                                          |
 | `ripgrep`     | `.ripgreprc`                                              | `.zprofile` points `RIPGREP_CONFIG_PATH` at it           |
@@ -67,8 +70,9 @@ lists it as not linked.
 
 - Top-level dotfiles and directories (`.zshrc`, `.vim`, `.gnupg`, …) are
   linked as a whole.
-- `~/.config` is a real directory. The files below `.config` are linked one by
-  one. Everything else programs keep there stays out of the repo.
+- `~/.config` and `~/.local` are real directories. The files below `.config`
+  and `.local` are linked one by one. Everything else programs keep there
+  stays out of the repo.
 - Some programs save their config by writing a new file over the link. The
   file then silently stops being the one in the repo. `make check` lists those.
 - After deleting a file from the repo, `make clean-links` removes its link.
@@ -101,7 +105,7 @@ long as `~/.config` is such a link. To migrate:
 4. Link the files, then check:
 
    ```sh
-   cd ~/dotfiles && make gpg xsession ranger zathura && make check
+   cd ~/dotfiles && make gpg xsession ranger zathura xdg && make check
    ```
 
    These are the areas with files in `.config`. Plain `make` also works, but

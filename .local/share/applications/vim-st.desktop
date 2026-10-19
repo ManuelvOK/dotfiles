@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Vim in st
+Comment=xdg-open ignores Terminal=true, so this starts the terminal itself
+Exec=st -e vim %F
+NoDisplay=true
