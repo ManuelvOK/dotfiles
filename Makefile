@@ -19,15 +19,12 @@ GIT_PKGS  = git git-delta git-lfs
 GPG_LINKS = .gnupg .config/environment.d/vars.conf
 GPG_PKGS  = gnupg pinentry
 
-MAIL_LINKS   = .mutt .mailcap
-# from the private submodule
-MAIL_PRIVATE = .mbsyncrc .mutt/accounts .mutt/aliases .mutt/foldertypes \
-               .mutt/common/private_colors
-MAIL_PKGS    = neomutt isync w3m colordiff
+# The accounts and the ssh config come from the private submodule. Its
+# private.mk links them, see the end of this file.
+MAIL_LINKS = .mutt .mailcap
+MAIL_PKGS  = neomutt isync w3m colordiff
 
-# from the private submodule, uses gpg-agent as ssh agent
-SSH_PRIVATE = .ssh/config
-SSH_PKGS    = openssh
+SSH_PKGS = openssh
 
 XSESSION_LINKS = .xinitrc .Xresources \
                  .config/systemd/user/dwm-session.target \
@@ -59,8 +56,6 @@ JSHINT_LINKS = .jshintrc
 
 AREAS = zsh vim git gpg mail ssh xsession ranger zathura stalonetray alsa \
         ripgrep jshint
-
-PRIVATE_LINKS = $(MAIL_PRIVATE) $(SSH_PRIVATE)
 
 LINKS = $(ZSH_LINKS) $(VIM_LINKS) $(GIT_LINKS) $(GPG_LINKS) $(MAIL_LINKS) \
         $(XSESSION_LINKS) $(RANGER_LINKS) $(ZATHURA_LINKS) \
@@ -106,10 +101,10 @@ gpg: $(GPG_LINKS:%=$(HOME)/%)
 	$(call install,$(GPG_PKGS))
 	chmod 700 $(DOTFILES)/.gnupg
 
-mail: gpg $(MAIL_LINKS:%=$(HOME)/%) $(MAIL_PRIVATE:%=$(HOME)/%)
+mail: gpg $(MAIL_LINKS:%=$(HOME)/%)
 	$(call install,$(MAIL_PKGS))
 
-ssh: gpg $(SSH_PRIVATE:%=$(HOME)/%)
+ssh: gpg
 	$(call install,$(SSH_PKGS))
 
 xsession: $(XSESSION_LINKS:%=$(HOME)/%) \
@@ -148,14 +143,6 @@ $(CONFIG_LINKS:%=$(HOME)/%): $(HOME)/%:
 	  { echo "~/.config is a link, it must be a directory" >&2; exit 1; }
 	mkdir -p $(@D)
 	ln -s $(DOTFILES)/$* $@
-
-$(PRIVATE_LINKS:%=$(HOME)/%): $(HOME)/%:
-	ln -s $(DOTFILES)/private/$* $@
-
-$(HOME)/.ssh/config: | $(HOME)/.ssh
-
-$(HOME)/.ssh:
-	mkdir -m 700 $@
 
 # Checking {{{1
 # Everything in the repo that should be linked, independent of the areas
@@ -213,3 +200,8 @@ $(SUCKLESS:%=%-uninstall): %-uninstall:
 /usr/local/bin/st:        ; $(MAKE) st-install
 /usr/local/bin/slock:     ; $(MAKE) slock-install
 /usr/local/bin/dwmblocks: ; $(MAKE) dwmblocks-async-install
+
+# Private {{{1
+# Adds the private links to mail and ssh and sets PRIVATE_LINKS. Without the
+# submodule, those areas only install their packages.
+-include $(DOTFILES)/private/private.mk

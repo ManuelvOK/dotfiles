@@ -45,9 +45,10 @@ from the mail setup. sudo only asks when a package is actually missing.
 | `ripgrep`     | `.ripgreprc`                                              | `.zprofile` points `RIPGREP_CONFIG_PATH` at it           |
 | `jshint`      | `.jshintrc`                                               | jshint itself comes from npm                             |
 
-`private` is a private repository. Without access to it, the clone of that
-submodule fails and `make mail` and `make ssh` cannot link their files.
-Everything else works.
+`private` is a private repository. Its `private.mk` is included by the
+Makefile and links the private files of `mail` and `ssh`. Without access to
+it, the clone of that submodule fails and those two areas only install their
+packages. Everything else works. Its own README covers its files.
 
 | Other target            | Does                                                                         |
 |-------------------------|------------------------------------------------------------------------------|
@@ -59,7 +60,8 @@ Everything else works.
 | `make <name>-uninstall` | uninstalls it again                                                          |
 
 A new file in the repo has to be added to the `<AREA>_LINKS` of its area in
-the Makefile. Until then, `make check` lists it as not linked.
+the Makefile (or, in `private`, to `private.mk`). Until then, `make check`
+lists it as not linked.
 
 ## How linking works
 
