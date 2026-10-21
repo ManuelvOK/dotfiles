@@ -158,7 +158,7 @@ $(CONFIG_LINKS:%=$(HOME)/%): $(HOME)/%:
 # Checking {{{1
 # Everything in the repo that should be linked, independent of the areas
 # above. A file that no area links shows up as not linked.
-IGNORE    = . .. .git .gitmodules .gitignore_global .config .local
+IGNORE    = . .. .git .gitmodules .gitignore_global .config .local .claude
 ALL_TOP   = $(filter-out $(IGNORE), $(wildcard .*))
 # Only tracked files. The wildcard skips deletions not yet committed.
 ALL_CONFIG = $(wildcard $(shell git -C $(DOTFILES) ls-files .config .local))
