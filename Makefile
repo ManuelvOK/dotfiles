@@ -31,10 +31,12 @@ XSESSION_LINKS = .xinitrc .Xresources \
                  .config/systemd/user/dwm-session.target \
                  .config/systemd/user/redshift.service.d/session.conf \
                  .config/systemd/user/battery-warn.service \
-                 $(wildcard .config/redshift/* .config/dunst/*)
+                 .config/systemd/user/keyboard.service \
+                 $(wildcard .config/redshift/* .config/dunst/*) \
+                 $(wildcard .config/xkb/*/*)
 # X, redshift, notifications, and what scripts/ calls for dwm and dwmblocks.
 # autorandr's profiles and settings come from the private submodule.
-XSESSION_PKGS  = xorg-xinit xorg-xrdb xorg-xrandr xorg-xmodmap \
+XSESSION_PKGS  = xorg-xinit xorg-xrdb xorg-xrandr xorg-xinput xorg-xkbcomp \
                  xorg-setxkbmap xorg-xset redshift dunst libnotify \
                  brightnessctl playerctl libpulse xss-lock autorandr
 XSESSION_AUR   = networkmanager-dmenu-git

@@ -1,0 +1,6 @@
+// Swaps y and z (QWERTZ habit). Added after the usual keycodes, see
+// scripts/keyboard_conf.sh.
+xkb_keycodes "swap" {
+    <AD06> = 52;
+    <AB01> = 29;
+};

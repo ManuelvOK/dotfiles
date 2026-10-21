@@ -5,4 +5,4 @@ Description=dwm X session
 BindsTo=graphical-session.target
 Wants=graphical-session-pre.target
 After=graphical-session-pre.target
-Wants=redshift.service battery-warn.service
+Wants=redshift.service battery-warn.service keyboard.service

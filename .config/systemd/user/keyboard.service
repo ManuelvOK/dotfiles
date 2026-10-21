@@ -1,0 +1,10 @@
+# Keyboard layouts and key repeat for the X session, again after every
+# (un)plugged device. Pulled in by dwm-session.target.
+[Unit]
+Description=Keyboard setup
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+ExecStart=%h/dotfiles/scripts/keyboard_conf.sh --watch
+Restart=on-failure
