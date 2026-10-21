@@ -33,7 +33,7 @@ XSESSION_LINKS = .xinitrc .Xresources \
                  .config/systemd/user/battery-warn.service \
                  $(wildcard .config/redshift/* .config/dunst/*)
 # X, redshift, notifications, and what scripts/ calls for dwm and dwmblocks.
-# The autorandr profiles come from the private submodule.
+# autorandr's profiles and settings come from the private submodule.
 XSESSION_PKGS  = xorg-xinit xorg-xrdb xorg-xrandr xorg-xmodmap \
                  xorg-setxkbmap xorg-xset redshift dunst libnotify \
                  brightnessctl playerctl libpulse xss-lock autorandr
