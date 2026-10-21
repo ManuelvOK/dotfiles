@@ -32,10 +32,11 @@ XSESSION_LINKS = .xinitrc .Xresources \
                  .config/systemd/user/redshift.service.d/session.conf \
                  .config/systemd/user/battery-warn.service \
                  $(wildcard .config/redshift/* .config/dunst/*)
-# X, redshift, notifications, and what scripts/ calls for dwm and dwmblocks
+# X, redshift, notifications, and what scripts/ calls for dwm and dwmblocks.
+# The autorandr profiles come from the private submodule.
 XSESSION_PKGS  = xorg-xinit xorg-xrdb xorg-xrandr xorg-xmodmap \
                  xorg-setxkbmap xorg-xset redshift dunst libnotify \
-                 brightnessctl playerctl libpulse xss-lock
+                 brightnessctl playerctl libpulse xss-lock autorandr
 XSESSION_AUR   = networkmanager-dmenu-git
 
 RANGER_LINKS = $(wildcard .config/ranger/*)
@@ -215,6 +216,6 @@ $(SUCKLESS:%=%-uninstall): %-uninstall:
 /usr/local/bin/dwmblocks: ; $(MAKE) dwmblocks-async-install
 
 # Private {{{1
-# Adds the private links to mail and ssh and sets PRIVATE_LINKS. Without the
-# submodule, those areas only install their packages.
+# Adds the private links to mail, ssh and xsession and sets PRIVATE_LINKS.
+# Without the submodule, those areas only install their packages.
 -include $(DOTFILES)/private/private.mk
