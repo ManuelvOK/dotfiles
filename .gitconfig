@@ -42,6 +42,8 @@
     line-numbers = true
     side-by-side = true
     tabs = 4
+    plus-style = syntax "#1f4d2a"
+    plus-emph-style = syntax "#2f7a40"
     # git marks moved lines bold purple/cyan, and every other moved block bold
     # blue/yellow (diff.colorMoved). Show them on dark backgrounds that fit
     # delta instead.
