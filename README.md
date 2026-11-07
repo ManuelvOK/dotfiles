@@ -39,7 +39,8 @@ from the mail setup. sudo only asks when a package is actually missing.
 | `gpg`         | `.gnupg`, `.config/environment.d/vars.conf`               |                                                          |
 | `mail`        | `.mutt`, `.mbsyncrc` and mutt accounts                    | needs `gpg` and yay                                      |
 | `ssh`         | `.ssh/config`                                             | needs `gpg`, which is the ssh agent                      |
-| `xsession`    | `.xinitrc`, `.Xresources`, systemd units, redshift, dunst | builds dwm, st, slock and dwmblocks-async, needs yay     |
+| `xsession`    | `.xinitrc`, `.Xresources`, systemd units, redshift, dunst | builds dwm, st, slock, dwmblocks-async and edgewarp,     |
+|               |                                                           | needs yay                                                |
 | `ranger`      | `.config/ranger`                                          |                                                          |
 | `zathura`     | `.config/zathura`                                         |                                                          |
 | `xdg`         | `mimeapps.list`, desktop entries for vim and mutt         | PDFs to zathura, images to sxiv, code to vim in st,      |
@@ -150,6 +151,7 @@ and are `PartOf=graphical-session.target`. See `.config/systemd/user/`.
 |----------------|---------------------------------------------------------------------------------------------|
 | `redshift`     | warmer colours in the evening                                                               |
 | `battery-warn` | notifies when the laptop is docked but not charging, runs on battery, or the battery is low |
+| `edgewarp`     | moves the pointer over monitor edges to the same relative height, also to shorter screens   |
 
 `scripts/battery-warn` recognises the dock by its USB ID. A new dock goes into
 `DOCKS` at the top of the script.

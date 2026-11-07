@@ -32,13 +32,15 @@ XSESSION_LINKS = .xinitrc .Xresources \
                  .config/systemd/user/redshift.service.d/session.conf \
                  .config/systemd/user/battery-warn.service \
                  .config/systemd/user/keyboard.service \
+                 .config/systemd/user/edgewarp.service \
                  $(wildcard .config/redshift/* .config/dunst/*) \
                  $(wildcard .config/xkb/*/*)
 # X, redshift, notifications, and what scripts/ calls for dwm and dwmblocks.
 # autorandr's profiles and settings come from the private submodule.
 XSESSION_PKGS  = xorg-xinit xorg-xrdb xorg-xrandr xorg-xinput xorg-xkbcomp \
                  xorg-setxkbmap xorg-xset redshift dunst libnotify \
-                 brightnessctl playerctl libpulse xss-lock autorandr
+                 brightnessctl playerctl libpulse xss-lock autorandr \
+                 libxi libxfixes libxrandr
 XSESSION_AUR   = networkmanager-dmenu-git
 
 RANGER_LINKS = $(wildcard .config/ranger/*)
@@ -115,7 +117,7 @@ mail: gpg $(MAIL_LINKS:%=$(HOME)/%) | /usr/bin/yay
 ssh: gpg
 	$(call install,$(SSH_PKGS))
 
-xsession: $(XSESSION_LINKS:%=$(HOME)/%) \
+xsession: $(XSESSION_LINKS:%=$(HOME)/%) $(DOTFILES)/scripts/edgewarp \
           /usr/local/bin/dwm /usr/local/bin/st /usr/local/bin/slock \
           /usr/local/bin/dwmblocks | /usr/bin/yay
 	$(call install,$(XSESSION_PKGS))
@@ -160,7 +162,8 @@ $(CONFIG_LINKS:%=$(HOME)/%): $(HOME)/%:
 # Checking {{{1
 # Everything in the repo that should be linked, independent of the areas
 # above. A file that no area links shows up as not linked.
-IGNORE    = . .. .git .gitmodules .gitignore_global .config .local .claude
+IGNORE    = . .. .git .gitmodules .gitignore .gitignore_global .config .local \
+            .claude
 ALL_TOP   = $(filter-out $(IGNORE), $(wildcard .*))
 # Only tracked files. The wildcard skips deletions not yet committed.
 ALL_CONFIG = $(wildcard $(shell git -C $(DOTFILES) ls-files .config .local))
@@ -197,6 +200,11 @@ yay-install: /usr/bin/yay
 /usr/bin/yay:
 	cd /tmp && { [ -d yay ] || git clone https://aur.archlinux.org/yay.git; }
 	cd /tmp/yay && makepkg -si
+
+# edgewarp is the only script in C. Its binary is not tracked, see .gitignore.
+$(DOTFILES)/scripts/edgewarp: $(DOTFILES)/scripts/edgewarp.c
+	cc -std=c99 -pedantic -Wall -Wextra -Os -o $@ $< \
+	  -lX11 -lXi -lXfixes -lXrandr
 
 # dwm, st, slock and dwmblocks-async are built from my forks and installed to
 # /usr/local. An existing clone is only rebuilt. The install lines call make

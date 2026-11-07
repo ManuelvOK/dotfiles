@@ -1,0 +1,10 @@
+# Moves the pointer over monitor edges to the same relative height, see
+# scripts/edgewarp.c. Pulled in by dwm-session.target.
+[Unit]
+Description=Pointer warping between monitors
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+ExecStart=%h/dotfiles/scripts/edgewarp
+Restart=on-failure
