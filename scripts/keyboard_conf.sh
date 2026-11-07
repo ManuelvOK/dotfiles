@@ -34,10 +34,13 @@ apply() {
 apply
 [[ $1 == --watch ]] || exit 0
 
-# test-xi2 prints every event on the root window, grep keeps the device
-# changes. Plugging in a keyboard adds several devices: wait a second and
-# drop the events that came in meanwhile.
-xinput test-xi2 --root | grep --line-buffered '(HierarchyChanged)' |
+# udev reports input devices that come or go, without touching X. Not
+# xinput test-xi2 --root: it selects all XI2 events on the root window,
+# and the server then no longer sends pointer motion there to dwm.
+# Plugging in a keyboard adds several devices: wait a second and drop the
+# events that came in meanwhile.
+udevadm monitor --udev --subsystem-match=input |
+grep --line-buffered -E '^UDEV .* (add|remove) ' |
 while read -r _; do
 	sleep 1
 	while read -r -t 0.1 _; do :; done
