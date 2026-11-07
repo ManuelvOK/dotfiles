@@ -247,6 +247,12 @@ autoremove() {
   sudo pacman -Runs $orphans
 }
 
+# removable drives via udisks2, as user without sudo (replaces pmount).
+# Take "sda1" or "/dev/sda1". peject powers the drive off for unplugging.
+pmount()  { udisksctl mount -b /dev/${1#/dev/} }
+pumount() { udisksctl unmount -b /dev/${1#/dev/} }
+peject()  { udisksctl power-off -b /dev/${1#/dev/} }
+
 # mutt aliases
 alias mutt='mutt_profile normal ifsr'
 alias muttt='mutt_profile normal tu-dresden'
