@@ -1,0 +1,152 @@
+#!/bin/sh
+# Status line for Claude Code, set as statusLine.command in
+# ~/.claude/settings.json. Reads the session JSON on stdin and prints e.g.
+#   NORMAL │ ~/dotfiles │ master ↑2 ● │ +120 −34
+#                    Opus 5.5 high │ ctx 23% │ 5h 24% 2h13m │ 7d 41% 3d4h │ cache 3m
+# The left part is aligned left, the rest right on the same line. If both
+# don't fit, the right part goes to a second line.
+# Directory and branch use the colors of the zsh prompt. Percentages turn
+# yellow at 50 and red at 80. Missing fields are left out.
+
+# Claude Code indents the status line, so not all of $COLUMNS is usable
+margin=4
+
+eval "$(jq -r '@sh "
+  dir=\(.workspace.current_dir // .cwd // "")
+  vim=\(.vim.mode // "")
+  model=\(.model.display_name // "")
+  effort=\(.effort.level // "")
+  ctx=\(.context_window.used_percentage // "")
+  h5=\(.rate_limits.five_hour.used_percentage // "")
+  h5_reset=\(.rate_limits.five_hour.resets_at // "")
+  d7=\(.rate_limits.seven_day.used_percentage // "")
+  d7_reset=\(.rate_limits.seven_day.resets_at // "")
+  cache_seen=\(.prompt_cache.caching_observed // false)
+  cache_warm=\(.prompt_cache.warm // false)
+  cache_expires=\(.prompt_cache.expires_at // "")
+"')"
+
+esc=$(printf '\033')
+reset="$esc[0m"
+bold="$esc[1m"
+blue="$esc[1;34m"
+magenta="$esc[1;35m"
+red="$esc[31m"
+green="$esc[1;32m"
+yellow="$esc[33m"
+grey="$esc[38;5;244m"
+cyan="$esc[36m"
+
+now=$(date +%s)
+
+# Percentage, rounded down, colored by how much is used
+pct() {
+  p=${1%%.*}
+  if [ "$p" -ge 80 ]; then c=$red
+  elif [ "$p" -ge 50 ]; then c=$yellow
+  else c=$green
+  fi
+  printf '%s%s%%%s' "$c" "$p" "$reset"
+}
+
+# Time until the epoch second $1, as 3d4h, 2h13m or 5m
+left() {
+  s=$(( $1 - now ))
+  [ "$s" -lt 0 ] && s=0
+  d=$(( s / 86400 )) h=$(( s % 86400 / 3600 )) m=$(( s % 3600 / 60 ))
+  if [ "$d" -gt 0 ]; then printf '%dd%dh' "$d" "$h"
+  elif [ "$h" -gt 0 ]; then printf '%dh%02dm' "$h" "$m"
+  else printf '%dm' "$m"
+  fi
+}
+
+sep=" $grey│$reset "
+lpart="" rpart=""
+addl() { lpart="${lpart:+$lpart$sep}$1"; }
+addr() { rpart="${rpart:+$rpart$sep}$1"; }
+
+# Left: vim mode, directory, git, uncommitted lines
+
+case $vim in
+  NORMAL) addl "$blue$vim$reset" ;;
+  INSERT) addl "$green$vim$reset" ;;
+  VISUAL*) addl "$magenta$vim$reset" ;;
+  ?*) addl "$bold$vim$reset" ;;
+esac
+
+if [ -n "$dir" ]; then
+  # Like %4~ in zsh: ~ for $HOME, at most the last four parts
+  case $dir in
+    "$HOME") short="~" ;;
+    "$HOME"/*) short="~/${dir#"$HOME"/}" ;;
+    *) short=$dir ;;
+  esac
+  short=$(printf '%s' "$short" | awk -F/ \
+    '{ if (NF > 4) { s = $(NF-3); for (i = NF-2; i <= NF; i++) s = s "/" $i; print s } else print }')
+  addl "$blue$short$reset"
+
+  # Branch (or :<hash> if detached), ↑ahead ↓behind, red ● if anything
+  # changed, green ✔ if clean
+  git=$(git -C "$dir" --no-optional-locks status --porcelain=v2 --branch \
+    2>/dev/null | awk '
+      /^# branch\.oid /  { oid = substr($3, 1, 7) }
+      /^# branch\.head / { head = $3 }
+      /^# branch\.ab /   { ahead = substr($3, 2); behind = substr($4, 2) }
+      !/^#/              { dirty = 1 }
+      END {
+        if (head == "") exit
+        if (head == "(detached)") head = ":" oid
+        printf "%s %d %d %d", head, ahead, behind, dirty
+      }')
+  if [ -n "$git" ]; then
+    set -- $git
+    g="$magenta$1$reset"
+    [ "$2" -gt 0 ] && g="$g $yellow↑$2$reset"
+    [ "$3" -gt 0 ] && g="$g $yellow↓$3$reset"
+    if [ "$4" -eq 1 ]; then g="$g $red●$reset"; else g="$g $green✔$reset"; fi
+    addl "$g"
+
+    # Lines added and removed since the last commit, staged or not.
+    # Untracked files only show up in the ●.
+    set -- $(git -C "$dir" --no-optional-locks diff HEAD --numstat \
+      2>/dev/null | awk '{ a += $1; r += $2 } END { print a + 0, r + 0 }')
+    if [ "${1:-0}" -gt 0 ] || [ "${2:-0}" -gt 0 ]; then
+      addl "$green+$1$reset $red−$2$reset"
+    fi
+  fi
+fi
+
+# Right: model, usage, cache
+
+if [ -n "$model" ]; then
+  addr "$cyan$model$reset${effort:+ $grey$effort$reset}"
+fi
+[ -n "$ctx" ] && addr "${grey}ctx$reset $(pct "$ctx")"
+[ -n "$h5" ] && addr "${grey}5h$reset $(pct "$h5")${h5_reset:+ $grey$(left "$h5_reset")$reset}"
+[ -n "$d7" ] && addr "${grey}7d$reset $(pct "$d7")${d7_reset:+ $grey$(left "$d7_reset")$reset}"
+
+# Time until the prompt cache goes cold. Yellow in its last minute.
+if [ "$cache_warm" = true ] && [ -n "$cache_expires" ]; then
+  if [ $(( cache_expires - now )) -lt 60 ]; then c=$yellow; else c=$green; fi
+  addr "${grey}cache$reset $c$(left "$cache_expires")$reset"
+elif [ "$cache_seen" = true ]; then
+  addr "${grey}cache$reset ${red}cold$reset"
+fi
+
+# Output
+
+# Visible width: without color codes, in characters, not bytes
+width() { printf '%s' "$1" | sed "s/$esc\[[0-9;]*m//g" | wc -m; }
+
+cols=$(( ${COLUMNS:-80} - margin ))
+lw=$(width "$lpart") rw=$(width "$rpart")
+
+if [ -z "$rpart" ]; then
+  printf '%s\n' "$lpart"
+elif [ -z "$lpart" ]; then
+  printf '%*s%s\n' $(( cols - rw > 0 ? cols - rw : 0 )) '' "$rpart"
+elif [ $(( lw + 2 + rw )) -le "$cols" ]; then
+  printf '%s%*s%s\n' "$lpart" $(( cols - lw - rw )) '' "$rpart"
+else
+  printf '%s\n%*s%s\n' "$lpart" $(( cols - rw > 0 ? cols - rw : 0 )) '' "$rpart"
+fi
